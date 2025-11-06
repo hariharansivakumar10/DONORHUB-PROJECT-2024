@@ -1,28 +1,2044 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DonorHub - Blood Donor Management System</title>
-    <link rel="stylesheet" href="/frontend/css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DONOUR HUB MANAGENMENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --rose-50:#fff1f2;--rose-100:#ffe4e6;--rose-200:#fecdd3;--rose-300:#fda4af;--rose-400:#fb7185;--rose-500:#f43f5e;--rose-600:#e11d48;
+      --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-900:#111827;
+      --emerald-100:#d1fae5;--emerald-700:#047857;
+      --radius-xl:18px;--radius-2xl:24px;--shadow-1:0 6px 24px rgba(16,24,40,.06), 0 2px 6px rgba(16,24,40,.04);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--gray-900);background:linear-gradient(to bottom,var(--rose-50),#fff 30%,#fff)}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1120px;margin:0 auto;padding:0 1rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--rose-600);color:#fff;border:none;padding:.9rem 1.1rem;border-radius:14px;font-weight:600;cursor:pointer;box-shadow:var(--shadow-1)}
+    .btn.outline{background:transparent;color:var(--rose-600);border:1px solid var(--rose-300);box-shadow:none}
+  /* Ensure modal buttons center their label text */
+  .plan-modal .btn, .plan-modal .btn.outline, #membership-modal .btn, #membership-modal .btn.outline, #order-modal .btn, #order-modal .btn.outline { justify-content:center; text-align:center; }
+    .btn:active{transform:translateY(1px)}
+    .chip{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.75rem;font-weight:600}
+
+    /* Navbar */
+  .nav{position:sticky;top:0;z-index:40;backdrop-filter:blur(8px);background:rgba(255,255,255,0.98);border-bottom:1px solid rgba(0,0,0,0.06);box-shadow:0 6px 18px rgba(16,24,40,.04)}
+  .nav-inner{height:64px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{display:flex;align-items:center;gap:.5rem;font-weight:800}
+  .nav-links{display:none;gap:1.6rem;font-size:.98rem}
+  @media (min-width:768px){.nav-links{display:flex;margin:0 auto;justify-content:center}}
+  /* Right-side action group (Donate, Logout) */
+  .nav-actions{display:flex;gap:.6rem;align-items:center}
+  @media (max-width:767px){.nav-actions{gap:.4rem}}
+
+    /* Hero */
+    .hero{position:relative;overflow:hidden}
+    .hero-grid{display:grid;grid-template-columns:1fr;gap:2rem;align-items:center;padding:2rem 0 1rem}
+    @media (min-width:900px){.hero-grid{grid-template-columns:1.05fr .95fr;padding:3.5rem 0 1.5rem}}
+    .headline{font-size:clamp(2rem,5vw,3.25rem);line-height:1.05;margin:0;font-weight:900}
+    .subhead{margin:.75rem 0 0;color:var(--gray-600);font-size:1.05rem}
+
+    /* Animated blobs */
+    .bg-wrap{position:absolute;inset:0;z-index:-1;overflow:hidden}
+    .blob{position:absolute;filter:blur(40px);opacity:.7;border-radius:50%}
+    .blob.one{width:420px;height:420px;right:-80px;top:-120px;background:radial-gradient(circle at 40% 40%,var(--rose-200),var(--rose-400));animation:floatA 10s ease-in-out infinite alternate}
+    .blob.two{width:520px;height:520px;left:-140px;bottom:-160px;background:radial-gradient(circle at 50% 50%,#ffd1d8,var(--rose-300));opacity:.6;animation:floatB 12s ease-in-out infinite alternate}
+    @keyframes floatA{to{transform:translateY(30px) scale(1.05);opacity:.95}}
+    @keyframes floatB{to{transform:translateY(-20px) scale(.98);opacity:.85}}
+
+    /* Cards & sections */
+    section{padding:2.5rem 0}
+    .grid{display:grid;gap:1rem}
+    .grid.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (min-width:900px){.grid.kpi{grid-template-columns:repeat(4,1fr)}}
+    .card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-2xl);box-shadow:var(--shadow-1)}
+    .card.pad{padding:1.2rem}
+    .title{display:flex;align-items:center;gap:.6rem;font-weight:800}
+    .muted{color:var(--gray-600);font-size:.9rem}
+    .kpi-val{font-size:2rem;font-weight:800}
+
+    .inv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (min-width:600px){.inv-grid{grid-template-columns:repeat(4,1fr)}}
+
+    .donor-grid{grid-template-columns:1fr}
+    @media (min-width:800px){.donor-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (min-width:1060px){.donor-grid{grid-template-columns:repeat(3,1fr)}}
+
+    .donor-card{transition:transform .2s ease, box-shadow .2s ease}
+    .donor-card:hover{transform:translateY(-2px)}
+
+    /* Forms */
+    label{font-size:.85rem;font-weight:600;color:var(--gray-700)}
+    input,select,textarea{width:100%;padding:.65rem .8rem;border:1px solid var(--gray-300);border-radius:14px;font:inherit}
+    textarea{min-height:90px;resize:vertical}
+    .form-grid{display:grid;gap:.9rem}
+    @media (min-width:680px){.form-grid.two{grid-template-columns:repeat(2,1fr)}}
+
+    /* Timeline */
+    .step{display:flex;gap:.9rem;align-items:flex-start}
+    .icon{display:grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--rose-100);color:var(--rose-600)}
+
+    /* CTA */
+    .cta{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(90deg,var(--rose-500),#ef4444);color:#fff;padding:1.2rem}
+    @media (min-width:900px){.cta{padding:1.8rem}}
+
+    /* Utilities */
+    .row{display:flex;gap:.6rem;align-items:center}
+    .between{display:flex;justify-content:space-between;align-items:center}
+    .fade-up{opacity:0;transform:translateY(12px);transition:.6s ease}
+    .fade-up.in{opacity:1;transform:none}
+
+    /* Badges */
+    .ok{background:var(--emerald-100);color:var(--emerald-700)}
+    .low{background:var(--rose-100);color:var(--rose-600)}
+    .avail{background:var(--emerald-100);color:var(--emerald-700)}
+    .busy{background:#eef2f7;color:#5b6470}
+
+    footer{border-top:1px solid var(--gray-200);padding:1.2rem 0;color:var(--gray-600);font-size:.95rem}
+    /* Mobile responsive tweaks */
+    @media (max-width:600px){
+      .login-panel{min-width:unset;max-width:92vw;padding:1rem;border-radius:12px}
+      .login-logo{width:52px;height:52px;font-size:18px}
+      .btn{padding:1rem 1rem;border-radius:14px;font-size:1rem}
+      input,select,textarea{padding:.85rem;font-size:1rem}
+      #mini-map-wrap{height:220px}
+      /* Make plan/order modal content responsive and touch-friendly */
+      .plan-modal > div, #membership-modal > div, #order-modal > div { max-width:92vw !important; width:auto !important; padding:1rem !important; border-radius:14px !important; }
+      .plan-card { min-width:120px !important; }
+    }
+    @media (max-width:380px){
+      .nav-inner{padding:0 0.5rem}
+      .headline{font-size:1.6rem}
+      .btn{padding:.9rem .9rem;font-size:.95rem}
+    }
+  /* Login overlay styles */
+  #login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999999;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .login-panel{background:linear-gradient(180deg,#fff,#fbfbfd);padding:2.25rem;border-radius:18px;min-width:440px;max-width:720px;box-shadow:0 20px 60px rgba(2,6,23,.5);border:1px solid rgba(16,24,40,.06)}
+  .login-header{display:flex;align-items:center;gap:1rem;margin-bottom:.6rem}
+  .login-logo{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:22px;background:linear-gradient(135deg,var(--rose-500),var(--rose-400))}
+  .login-title{font-size:1.15rem;font-weight:800;margin:0}
+  .login-sub{color:var(--gray-500);font-size:.95rem;margin-top:.15rem}
+  .login-body{display:grid;gap:.7rem;margin-top:.8rem}
+  .login-input{padding:.85rem;border-radius:12px;border:1px solid #e6e8eb;font-size:1rem}
+  .login-cta{display:flex;gap:.6rem;align-items:center;justify-content:space-between;margin-top:.6rem}
+  .login-remember{display:inline-flex;align-items:center;gap:.4rem;color:var(--gray-600)}
+  /* Profile & login tab tweaks */
+  .profile-menu{display:none}
+  .login-tabs{margin-bottom:0.6rem;display:flex;gap:.5rem}
+  .login-tabs button{flex:1}
+  #signup-form{display:none}
+  </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">DonorHub</div>
-            <div class="nav-links">
-                <a href="#" class="nav-link" data-page="home">Home</a>
-                <a href="#" class="nav-link" data-page="donors">Donors</a>
-                <a href="#" class="nav-link" data-page="requests">Requests</a>
-                <a href="#" class="nav-link" data-page="login" id="loginLink">Login</a>
+  <!-- NAVBAR -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2c1.5 4 6 7 6 11a6 6 0 1 1-12 0c0-4 4.5-7 6-11Z" fill="currentColor"/></svg>
+        Lifeline
+      </div>
+      <nav class="nav-links">
+        <a href="#inventory">Inventory</a>
+        <a href="#donors">Donors</a>
+        <a href="#donate">Become a Donor</a>
+        <a href="#request">Request</a>
+      </nav>
+      <div class="nav-actions">
+        <div class="profile-menu" id="profile-menu" style="display:none;position:relative">
+          <button class="btn outline" id="profile-btn" onclick="toggleProfileMenu(event)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <span id="profile-name">User</span>
+          </button>
+          <div id="profile-dropdown" style="display:none;position:absolute;right:0;top:54px;min-width:260px;background:#fff;border:1px solid #eee;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,.12);padding:12px;z-index:999">
+            <!-- profile content populated by JS -->
+            <div id="profile-info" style="display:grid;gap:.45rem">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:800" id="pd-name">User</div>
+                <div id="pd-badge" class="chip" style="background:#f3f4f6;color:var(--rose-600);font-weight:700">Free</div>
+              </div>
+              <div id="pd-contact" class="muted" style="font-size:.95rem">📞 <span id="pd-phone">—</span><br/>✉ <span id="pd-email">—</span></div>
+              <div style="display:flex;gap:.5rem;margin-top:.4rem">
+                <button class="btn" id="pd-edit">Edit Profile</button>
+                <button class="btn outline" id="pd-logout">Logout</button>
+              </div>
+              <div style="margin-top:.6rem;font-size:.92rem;color:var(--gray-600)" id="pd-extra"></div>
             </div>
-        </nav>
-    </header>
+          </div>
+        </div>
+        <button class="btn" id="donate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m-7-7h14" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+          Donate
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <main id="app">
-        <!-- Content will be loaded dynamically -->
-    </main>
+  <!-- LOGIN OVERLAY (blocks page until login) -->
+  <div id="login-overlay">
+    <div class="login-panel">
+      <div class="login-header">
+        <div class="login-logo">❤</div>
+        <div>
+          <div class="login-title">Welcome to Donour Hub</div>
+          <div class="login-sub">Sign in or create a new donor account</div>
+        </div>
+      </div>
+      <div class="login-body">
+        <div class="login-tabs" style="display:flex;gap:1rem;margin-bottom:1rem">
+          <button class="btn" id="tab-signin">Sign In</button>
+          <button class="btn outline" id="tab-signup">New Donor</button>
+        </div>
 
-    <script src="/frontend/js/app.js" type="module"></script>
+        <!-- Sign In Form -->
+        <div id="signin-form">
+          <input id="login-user" class="login-input" placeholder="Username" />
+          <input id="login-pass" class="login-input" type="password" placeholder="Password" />
+          <div style="text-align:right;margin-top:.2rem"><a href="#" id="forgot-link" style="color:var(--rose-600);font-weight:600">Forgot password?</a></div>
+          <div class="login-cta">
+            <label class="login-remember"><input type="checkbox" id="remember-me" /> Remember me</label>
+            <div style="display:flex;gap:.6rem">
+              <button class="btn outline" onclick="document.getElementById('login-overlay').style.display='none';">Cancel</button>
+              <button class="btn" id="login-btn">Sign In</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div id="signup-form" style="display:none">
+          <input id="signup-name" class="login-input" placeholder="Full Name" />
+          <select id="signup-group" class="login-input"><option value="">Select Blood Group</option></select>
+          <select id="signup-city" class="login-input"><option value="">Select City</option></select>
+          <input id="signup-phone" class="login-input" placeholder="Phone Number" />
+          <input id="signup-email" class="login-input" placeholder="Email" />
+          <input id="signup-user" class="login-input" placeholder="Choose Username" />
+          <input id="signup-pass" class="login-input" type="password" placeholder="Choose Password" />
+          <div class="login-cta">
+            <div style="display:flex;gap:.6rem">
+              <button class="btn outline" onclick="document.getElementById('login-overlay').style.display='none';">Cancel</button>
+              <button class="btn" id="signup-btn">Create Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal (hidden) -->
+  <div id="edit-profile-modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:99999;background:rgba(0,0,0,.32)">
+    <div style="background:#fff;padding:1.4rem;border-radius:14px;min-width:320px;max-width:520px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem"><div style="font-weight:800">Edit Profile</div><button class="btn outline" onclick="document.getElementById('edit-profile-modal').style.display='none'">Close</button></div>
+      <div style="display:grid;gap:.6rem">
+        <input id="edit-name" placeholder="Full name" />
+        <select id="edit-group"></select>
+        <select id="edit-city"></select>
+        <input id="edit-phone" placeholder="Phone" />
+        <input id="edit-email" placeholder="Email" />
+        <div style="display:flex;gap:.5rem">
+          <button class="btn" id="save-profile">Save</button>
+          <button class="btn outline" id="cancel-profile">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password reset panels (request token and reset) -->
+  <div id="pw-request-panel" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:99998;background:rgba(0,0,0,.28)">
+    <div style="background:#fff;padding:1.2rem;border-radius:12px;min-width:300px">
+      <div style="font-weight:800;margin-bottom:.4rem">Reset password</div>
+      <div class="muted" style="margin-bottom:.6rem">Enter your registered email to receive a reset token (demo shows token on screen).</div>
+      <input id="pw-req-email" placeholder="you@example.com" />
+      <div style="display:flex;gap:.5rem;margin-top:.6rem"><button class="btn" id="send-token-btn">Send token</button><button class="btn outline" id="pw-req-cancel">Cancel</button></div>
+      <div id="pw-req-info" class="muted" style="margin-top:.6rem;font-size:.9rem"></div>
+    </div>
+  </div>
+
+  <div id="pw-reset-panel" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:99998;background:rgba(0,0,0,.28)">
+    <div style="background:#fff;padding:1.2rem;border-radius:12px;min-width:300px">
+      <div style="font-weight:800;margin-bottom:.4rem">Enter reset token & new password</div>
+      <input id="pw-token" placeholder="Token" />
+      <input id="pw-new" placeholder="New password" type="password" />
+      <div style="display:flex;gap:.5rem;margin-top:.6rem"><button class="btn" id="pw-reset-btn">Reset password</button><button class="btn outline" id="pw-reset-cancel">Cancel</button></div>
+      <div id="pw-reset-info" class="muted" style="margin-top:.6rem;font-size:.9rem"></div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="bg-wrap">
+      <div class="blob one"></div>
+      <div class="blob two"></div>
+      <svg style="position:absolute;inset:0;opacity:.05" xmlns="http://www.w3.org/2000/svg">
+        <defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0v40" stroke="currentColor" fill="none"/></pattern></defs>
+        <rect width="100%" height="100%" fill="url(#g)"/>
+      </svg>
+    </div>
+    <div class="container hero-grid">
+      <div>
+  <h1 class="headline fade-up">DONOUR <span style="color:var(--rose-600)">HUB</span> MANAGENMENT</h1>
+        <p class="subhead fade-up" style="transition-delay:.1s">Connect donors, hospitals and recipients. Track inventory, register donors and fulfill requests in real‑time.</p>
+        <div class="row" style="gap:.8rem;margin-top:1rem">
+          <button class="btn" onclick="scrollToId('donate')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m-7-7h14" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            Become a Donor
+          </button>
+          <button class="btn outline" onclick="scrollToId('request')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Request Blood
+          </button>
+        </div>
+        <div class="row" style="gap:1.2rem;color:var(--gray-500);margin-top:1rem;font-size:.95rem">
+          <span class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s8-4.5 8-11a8 8 0 1 0-16 0c0 6.5 8 11 8 11Z" stroke="currentColor" stroke-width="2"/></svg> Safe & Verified</span>
+          <span class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M16 3a4 4 0 1 1-8 0M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2" stroke="currentColor" stroke-width="2"/></svg> Community Driven</span>
+          <span class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2"/></svg> Live Inventory</span>
+        </div>
+      </div>
+      <div style="position:relative">
+        <div class="fade-up" style="display:grid;place-items:center">
+          <div style="position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 200 260" style="width:180px;height:220px;display:block;">
+              <defs>
+                <linearGradient id="dropNew" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#f43f5e"/>
+                  <stop offset="100%" stop-color="#fb7185"/>
+                </linearGradient>
+                <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#f43f5e" flood-opacity="0.18"/>
+                </filter>
+              </defs>
+              <path d="M100 20 C120 70 170 120 170 180 C170 230 140 250 100 250 C60 250 30 230 30 180 C30 120 80 70 100 20 Z" fill="url(#dropNew)" filter="url(#dropShadow)"/>
+              <ellipse cx="100" cy="210" rx="38" ry="14" fill="#fff" fill-opacity=".18"/>
+              <ellipse cx="100" cy="70" rx="18" ry="8" fill="#fff" fill-opacity=".22"/>
+            </svg>
+          </div>
+        </div>
+        <div style="position:absolute;left:-8px;top:8px;display:none" class="kpi-float">
+          <div class="card pad row" style="gap:.7rem">
+            <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.5 14c1-1.6 1.5-3.2 1.5-5a8 8 0 1 0-16 0c0 6.5 8 11 8 11s2-.98 4-2.6" stroke="currentColor" stroke-width="2"/></svg></div>
+            <div><div style="font-size:.75rem;color:var(--gray-500)">Lives Saved</div><div style="font-weight:700">12,842</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section>
+    <div class="container grid kpi">
+      <div class="card pad fade-up"><div class="title"><span class="icon">❤</span>Requests Fulfilled</div><div class="kpi-val">1,284</div><div class="muted">+6% this week</div></div>
+      <div class="card pad fade-up" style="transition-delay:.06s"><div class="title"><span class="icon">🧪</span>Units Collected</div><div class="kpi-val">9,341</div><div class="muted">+3% this month</div></div>
+      <div class="card pad fade-up" style="transition-delay:.12s"><div class="title"><span class="icon">🏥</span>Hospitals Linked</div><div class="kpi-val">37</div><div class="muted">2 new</div></div>
+      <div class="card pad fade-up" style="transition-delay:.18s"><div class="title"><span class="icon">👥</span>Registered Donors</div><div class="kpi-val" id="kpi-donors">3,112</div><div class="muted">+41 today</div></div>
+    </div>
+  </section>
+
+  <!-- INVENTORY & FILTERS -->
+  <section id="inventory">
+    <div class="container">
+      <div class="row" style="gap:.8rem;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:1 1 260px" class="card pad fade-up">
+          <div class="title">🔎 Quick Filters</div>
+          <div style="height:.5rem"></div>
+          <div class="form-grid two">
+            <div>
+              <label>Blood Group</label>
+              <select id="filter-group"><option value="ALL">All</option></select>
+            </div>
+            <div>
+              <label>City</label>
+              <select id="filter-city"><option value="ALL">All</option></select>
+            </div>
+            <div style="grid-column:1/-1">
+              <label>Search</label>
+              <input id="search" placeholder="Search donors, groups, hospitals…" />
+            </div>
+            <div class="muted" style="font-size:.8rem">Tip: Combine filters + search to find rare donors fast.</div>
+          </div>
+        </div>
+        <div style="flex:2 1 520px" class="fade-up">
+          <div class="grid inv-grid" id="inventory-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DONOR DIRECTORY -->
+  <section id="donors">
+    <div class="container">
+      <div class="title fade-up">👥 Donor Directory</div>
+      <div class="muted fade-up" style="margin-top:.2rem">Reach verified donors who recently donated or are eligible now</div>
+      <div class="grid donor-grid" id="donor-grid" style="margin-top:1rem"></div>
+
+      <!-- Live Location Tracking Card -->
+      <div style="margin-top:1.2rem">
+        <div class="card pad fade-up">
+          <div class="title">📍 Live Location Tracking</div>
+          <div class="muted" style="margin-top:.4rem">Share your live location with hospitals/donors (optional). You can start and stop tracking anytime.</div>
+          <div style="height:.6rem"></div>
+          <div id="loc-status" class="muted">Status: <span id="loc-state">stopped</span></div>
+          <div style="margin-top:.6rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+            <button class="btn" id="loc-start">Start Tracking</button>
+            <button class="btn outline" id="loc-stop">Stop Tracking</button>
+            <button class="btn outline" id="loc-send" title="Send last location to server">Send Now</button>
+            <button class="btn outline" id="loc-sample" title="Collect high-accuracy sample">High-accuracy sample</button>
+          </div>
+          <div style="margin-top:.6rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+            <button class="btn outline" id="share-wa" title="Share via WhatsApp">WhatsApp</button>
+            <button class="btn outline" id="share-tg" title="Share via Telegram">Telegram</button>
+            <button class="btn outline" id="share-sms" title="Share via SMS">SMS</button>
+            <button class="btn outline" id="share-mail" title="Share via Email">Email</button>
+            <button class="btn outline" id="share-copy" title="Copy link">Copy Link</button>
+            <button class="btn outline" id="share-web" title="Native share" style="display:none">Share</button>
+          </div>
+          <div style="margin-top:.8rem;font-size:.95rem">
+            <div>Latitude: <span id="loc-lat">—</span></div>
+            <div>Longitude: <span id="loc-lng">—</span></div>
+            <div>Accuracy: <span id="loc-acc">—</span> meters</div>
+            <div>Last updated: <span id="loc-time">—</span></div>
+          </div>
+          <!-- Mini live map: lightweight SVG-based tracker to show movement -->
+          <div style="margin-top:.8rem">
+            <div style="font-weight:600;margin-bottom:.4rem">Live preview</div>
+            <div id="mini-map-wrap" style="width:100%;height:180px;border-radius:12px;overflow:hidden;border:1px solid #f1f1f1;background:linear-gradient(180deg,#fbfbfd,#fff);display:flex;align-items:center;justify-content:center">
+              <svg id="mini-map" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block;background-image:linear-gradient(180deg,#fff,#fafafa);">
+                <defs>
+                  <linearGradient id="mk" x1="0" x2="1"><stop offset="0%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#fb7185"/></linearGradient>
+                </defs>
+                <rect x="0" y="0" width="400" height="200" fill="transparent"></rect>
+                <g id="track-layer"></g>
+                <g id="points-layer"></g>
+                <circle id="marker" cx="200" cy="100" r="8" fill="url(#mk)" stroke="#fff" stroke-width="2" style="filter:drop-shadow(0 6px 14px rgba(244,63,94,.18));transition:cx .5s linear, cy .5s linear"></circle>
+              </svg>
+            </div>
+            <div class="muted" style="font-size:.85rem;margin-top:.45rem">The preview is an on-device visualization — not a full map. For precise navigation open the link in Maps.</div>
+          </div>
+          <div style="margin-top:.8rem;font-size:.95rem">
+            <label style="display:block;font-weight:600;margin-top:.6rem">I am viewing as</label>
+            <select id="viewer-role" style="padding:.5rem;border-radius:10px;border:1px solid #d1d5db;margin-top:.3rem">
+              <option value="Other">Other</option>
+              <option value="Donor">Donor</option>
+              <option value="Recipient">Recipient</option>
+              <option value="Hospital">Hospital</option>
+            </select>
+
+            <div style="margin-top:.6rem">
+              <div style="font-weight:600;margin-bottom:.3rem">Share visibility</div>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;margin-right:.8rem"><input type="checkbox" id="vis-donor" checked /> Donors</label>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;margin-right:.8rem"><input type="checkbox" id="vis-recipient" checked /> Recipients</label>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;margin-right:.8rem"><input type="checkbox" id="vis-hospital" checked /> Hospitals</label>
+              <label style="display:inline-flex;align-items:center;gap:.4rem;margin-right:.8rem"><input type="checkbox" id="vis-others" checked /> Others</label>
+            </div>
+
+            <label style="display:flex;align-items:center;gap:.5rem;margin-top:.6rem"><input type="checkbox" id="auto-send" /> Auto-send while tracking</label>
+          </div>
+          <div style="margin-top:.9rem">
+            <div class="muted" style="font-weight:600;margin-bottom:.5rem">Shared locations (visible to you)</div>
+            <div id="shared-locations" style="max-height:220px;overflow:auto;border-top:1px dashed #eee;padding-top:.6rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+    <!-- MEMBERSHIP TIERS -->
+    <section id="membership">
+      <div class="container">
+        <div class="title fade-up">🌟 Membership Tiers</div>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;margin-top:1.2rem">
+          <div class="card pad fade-up">
+            <div class="row" style="gap:.6rem"><span class="chip" style="background:var(--rose-100);color:var(--rose-600)">Silver</span><span style="font-weight:700">₹299/year</span></div>
+            <div class="muted" style="margin-top:.4rem">Access donor contact info (blurred), priority support.</div>
+          </div>
+          <div class="card pad fade-up">
+            <div class="row" style="gap:.6rem"><span class="chip" style="background:var(--rose-300);color:var(--rose-600)">Gold</span><span style="font-weight:700">₹599/year</span></div>
+            <div class="muted" style="margin-top:.4rem">Full contact info, faster blood ordering, exclusive offers.</div>
+          </div>
+          <div class="card pad fade-up">
+            <div class="row" style="gap:.6rem"><span class="chip" style="background:var(--rose-500);color:#fff">Platinum</span><span style="font-weight:700">₹999/year</span></div>
+            <div class="muted" style="margin-top:.4rem">All Gold benefits + free order processing, premium support.</div>
+          </div>
+        </div>
+        <div style="margin-top:1.2rem;text-align:center">
+          <button class="btn" onclick="showMembershipModal()">Become a Member</button>
+        </div>
+      </div>
+    </section>
+
+  <!-- FORMS -->
+  <section id="donate">
+    <div class="container row" style="gap:1rem;align-items:stretch;flex-wrap:wrap">
+      <div class="card pad" style="flex:1 1 420px">
+        <div class="title">🩸 Donor Registration</div>
+        <div style="height:.6rem"></div>
+        <form id="form-donor" class="form-grid two">
+          <div style="grid-column:1/-1">
+            <label>Full Name</label>
+            <input name="name" placeholder="e.g., Priya Sharma" required />
+          </div>
+          <div>
+            <label>Blood Group</label>
+            <select name="group" required></select>
+          </div>
+          <div>
+            <label>City</label>
+            <select name="city" required></select>
+          </div>
+          <div>
+            <label>Phone</label>
+            <input name="phone" placeholder="+91-9XXXXXXXXX" required />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </div>
+          <div style="grid-column:1/-1">
+            <button class="btn" type="submit">Add Donor</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card pad" style="flex:1 1 420px" id="request">
+        <div class="title">📋 Create Blood Request</div>
+        <div style="height:.6rem"></div>
+        <form id="form-request" class="form-grid two">
+          <div>
+            <label>Required Group</label>
+            <select name="req_group" required></select>
+          </div>
+          <div>
+            <label>Units</label>
+            <input type="number" min="1" name="units" value="1" required />
+          </div>
+          <div style="grid-column:1/-1">
+            <label>Hospital</label>
+            <select name="hospital" id="hospital-select" required></select>
+          </div>
+          <div style="grid-column:1/-1">
+            <label>Notes</label>
+            <textarea name="notes" placeholder="Any additional info…"></textarea>
+          </div>
+          <div style="grid-column:1/-1" class="row">
+            <button class="btn" type="submit">Submit Request</button>
+            <span class="muted row" style="gap:.3rem"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" stroke="currentColor" stroke-width="2"/></svg> We’ll auto‑match nearby donors.</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section>
+    <div class="container">
+      <div class="title fade-up">🚚 How it works</div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:1rem;gap:1rem">
+        <div class="card pad fade-up"><div class="step"><div class="icon">📝</div><div><strong>Create Request</strong><div class="muted">Enter required group & units. We’ll ping nearby eligible donors.</div></div></div></div>
+        <div class="card pad fade-up"><div class="step"><div class="icon">🧪</div><div><strong>Collect & Test</strong><div class="muted">Units are screened and typed for safety.</div></div></div></div>
+        <div class="card pad fade-up"><div class="step"><div class="icon">✅</div><div><strong>Deliver</strong><div class="muted">Verified units are dispatched with status updates.</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container">
+    <div class="cta fade-up">
+      <div class="between" style="gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:800;font-size:1.4rem">Every drop counts. Become a donor today.</div>
+          <div class="muted" style="color:#fff;margin-top:.2rem">Join thousands saving lives across India. Safe, quick and rewarding.</div>
+        </div>
+        <div class="row" style="gap:.6rem">
+          <button class="btn" style="background:#fff;color:var(--rose-600)" onclick="scrollToId('donate')">Register Now</button>
+          <button class="btn outline" style="border-color:#fff;color:#fff" onclick="alert('Slot booking coming soon!')">Book a Slot</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container between" style="gap:.8rem;flex-wrap:wrap">
+      <div class="row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2c1.5 4 6 7 6 11a6 6 0 1 1-12 0c0-4 4.5-7 6-11Z" fill="currentColor"/></svg> Lifeline © <span id="year"></span></div>
+      <div class="row" style="gap:1rem;color:var(--gray-700)"><span>📧 support@lifeline.org</span><span>📞 +91‑98765‑43210</span></div>
+    </div>
+  </footer>
+
+  <script>
+    // -------- Demo Data --------
+    const BLOOD_GROUPS = ["A+","A-","B+","B-","O+","O-","AB+","AB-"];
+    const CITIES = [
+      "Agra","Ahmedabad","Aizawl","Ajmer","Aligarh","Allahabad","Amaravati","Ambala","Amritsar","Asansol","Aurangabad",
+      "Bangalore","Bareilly","Belgaum","Bhavnagar","Bhiwandi","Bhopal","Bhubaneswar","Bikaner","Bilaspur","Bokaro Steel City",
+      "Chandigarh","Chennai","Coimbatore","Cuttack",
+      "Dehradun","Delhi","Dhanbad","Durgapur",
+      "Erode",
+      "Faridabad","Firozabad",
+      "Ghaziabad","Goa","Gorakhpur","Guntur","Gurgaon","Guwahati","Gwalior",
+      "Hubli-Dharwad","Hyderabad",
+      "Indore",
+      "Jabalpur","Jaipur","Jalandhar","Jammu","Jamnagar","Jamshedpur","Jhansi","Jodhpur",
+      "Kakinada","Kalyan-Dombivli","Kanpur","Kochi","Kolhapur","Kolkata","Kota","Kozhikode",
+      "Lucknow","Ludhiana",
+      "Madurai","Malappuram","Mangalore","Meerut","Moradabad","Mumbai","Muzaffarnagar","Muzaffarpur",
+      "Nagpur","Nanded","Nashik","Navi Mumbai","Noida",
+      "Panipat","Patna","Pimpri-Chinchwad","Pune",
+      "Raipur","Rajkot","Ranchi","Rohtak",
+      "Salem","Sangli","Siliguri","Solapur","Srinagar","Surat",
+      "Thane","Thiruvananthapuram","Thrissur","Tiruchirappalli","Tirunelveli","Tiruppur",
+      "Ujjain","Ulhasnagar","Vadodara","Varanasi","Vasai-Virar","Vijayawada","Visakhapatnam","Warangal"
+    ];
+
+    let donors = [
+      {
+        id: 1,
+        name: "Priya Sharma",
+        group: "A+",
+        city: "Chennai",
+        phone: "+91-9123456789",
+        email: "priya.sharma@example.com",
+        lastDonation: daysAgo(45),
+        available: true
+      },
+      {
+        id: 2,
+        name: "Rahul Verma",
+        group: "O-",
+        city: "Bengaluru",
+        phone: "+91-9876543210",
+        email: "rahul.verma@example.com",
+        lastDonation: daysAgo(90),
+        available: false
+      },
+      {
+        id: 3,
+        name: "Anjali Singh",
+        group: "B+",
+        city: "Hyderabad",
+        phone: "+91-9988776655",
+        email: "anjali.singh@example.com",
+        lastDonation: daysAgo(30),
+        available: true
+      },
+      {
+        id: 4,
+        name: "Vikram Patel",
+        group: "AB-",
+        city: "Mumbai",
+        phone: "+91-9090909090",
+        email: "vikram.patel@example.com",
+        lastDonation: daysAgo(120),
+        available: false
+      }
+    ];
+
+    // Fetch donors from demo API (if available), otherwise keep local demo data
+    (async function fetchDonorsFromServer(){
+      try{
+  const res = await authFetch('http://localhost:3001/api/donors');
+        if(!res.ok) throw new Error('no-server');
+        const data = await res.json();
+        donors = data.map(d => ({
+          id: d.id,
+          name: d.name,
+          group: d.group || d.blood_group,
+          city: d.city,
+          phone: d.phone,
+          email: d.email,
+          lastDonation: d.lastDonation || d.last_donation || null,
+          available: !!d.available
+        }));
+        renderDonors();
+        toast('Donors loaded from server');
+      }catch(err){
+        // fallback: keep bundled demo donors
+        console.warn('Donors API unreachable, using local demo data', err);
+      }
+    })();
+
+    // Comprehensive list of hospitals in India (small and large), with Tamil Nadu hospitals
+    const HOSPITALS = [
+      // Major Tamil Nadu Hospitals
+      "Apollo Hospitals Chennai","Fortis Malar Hospital Chennai","MIOT International Chennai","Sri Ramachandra Medical Centre Chennai",
+      "Sankara Nethralaya Chennai","Government General Hospital Chennai","Rajiv Gandhi Government General Hospital Chennai",
+      "Global Hospitals Chennai","Kauvery Hospital Chennai","Billroth Hospitals Chennai","Vijaya Hospital Chennai",
+      "Madras Medical Mission Chennai","Chettinad Hospital & Research Institute Chennai","Stanley Medical College Hospital Chennai",
+      "Kilpauk Medical College Hospital Chennai","Institute of Child Health & Hospital for Children Chennai",
+      "Cancer Institute (WIA) Chennai","E.S.I. Hospital Chennai","Government Royapettah Hospital Chennai",
+      "Government Stanley Hospital Chennai","Government Kilpauk Hospital Chennai","Government Omandurar Hospital Chennai",
+      "Government Peripheral Hospital Chennai","Government Kasturba Gandhi Hospital Chennai",
+      "Government Hospital for Women & Children Egmore Chennai","Government Communicable Diseases Hospital Chennai",
+      "Government Dental Hospital Chennai","Government Eye Hospital Chennai",
+      // Coimbatore
+      "K.G. Hospital Coimbatore","Ganga Hospital Coimbatore","PSG Hospitals Coimbatore","Coimbatore Medical College Hospital",
+      "Sri Ramakrishna Hospital Coimbatore","Gem Hospital Coimbatore","Ortho One Hospital Coimbatore",
+      "Government Hospital Coimbatore","Kovai Medical Center and Hospital Coimbatore",
+      // Madurai
+      "Apollo Specialty Hospitals Madurai","Government Rajaji Hospital Madurai","Velammal Medical College Hospital Madurai",
+      "Meenakshi Mission Hospital Madurai","Vadamalayan Hospitals Madurai",
+      // Tiruchirappalli
+      "Kauvery Hospital Tiruchirappalli","Government Hospital Tiruchirappalli","G.V.N. Hospital Tiruchirappalli",
+      // Salem
+      "Government Mohan Kumaramangalam Medical College Hospital Salem","Kauvery Hospital Salem",
+      // Tirunelveli
+      "Government Medical College Hospital Tirunelveli","Aravind Eye Hospital Tirunelveli",
+      // Vellore
+      "Christian Medical College Vellore","Government Vellore Medical College Hospital",
+      // Erode
+      "Government Headquarters Hospital Erode","K.M.C. Speciality Hospital Erode",
+      // Other Tamil Nadu Cities
+      "Government Hospital Thanjavur","Government Hospital Dindigul","Government Hospital Thoothukudi",
+      "Government Hospital Kanchipuram","Government Hospital Villupuram","Government Hospital Cuddalore",
+      "Government Hospital Kanyakumari","Government Hospital Sivaganga","Government Hospital Perambalur",
+      "Government Hospital Namakkal","Government Hospital Karur","Government Hospital Nagapattinam",
+      "Government Hospital Pudukkottai","Government Hospital Ramanathapuram","Government Hospital Tiruvannamalai",
+      "Government Hospital Krishnagiri","Government Hospital Dharmapuri","Government Hospital Ariyalur",
+      // Existing major hospitals from other states
+      "AIIMS Delhi","Fortis Hospital Mumbai","Max Super Speciality Hospital Delhi","Sir Ganga Ram Hospital Delhi",
+      "Lilavati Hospital Mumbai","Kokilaben Dhirubhai Ambani Hospital Mumbai","Manipal Hospital Bengaluru",
+      "Narayana Health Bengaluru","Medanta The Medicity Gurgaon","Tata Memorial Hospital Mumbai",
+      "PGIMER Chandigarh","Care Hospitals Hyderabad","Ruby Hall Clinic Pune","Jaslok Hospital Mumbai",
+      "Hinduja Hospital Mumbai","Shree Hospital Pune","Sunrise Care Chennai","GreenCross Labs Hyderabad","Apollo Midtown Bengaluru",
+      "KIMS Hospital Thiruvananthapuram","Columbia Asia Hospital Bengaluru","AMRI Hospitals Kolkata","BM Birla Heart Research Centre Kolkata",
+      "Indraprastha Apollo Hospital Delhi","St. John's Medical College Hospital Bengaluru",
+      "Breach Candy Hospital Mumbai","Saifee Hospital Mumbai","Holy Family Hospital Mumbai","Lokmanya Tilak Municipal General Hospital Mumbai",
+      "Seth GS Medical College & KEM Hospital Mumbai","King George's Medical University Lucknow","Sanjay Gandhi Postgraduate Institute Lucknow",
+      "Gandhi Hospital Hyderabad","Osmania General Hospital Hyderabad","Victoria Hospital Bengaluru","Bowring and Lady Curzon Hospital Bengaluru",
+      "Government Medical College Hospital Chandigarh","Civil Hospital Ahmedabad","Sardar Vallabhbhai Patel Hospital Ahmedabad",
+      "District Hospital Agra","District Hospital Bareilly","District Hospital Gorakhpur","District Hospital Jodhpur",
+      "District Hospital Ujjain","District Hospital Ranchi","District Hospital Raipur","District Hospital Patna",
+      "District Hospital Bhubaneswar","District Hospital Guwahati","District Hospital Imphal","District Hospital Shillong",
+      "District Hospital Aizawl","District Hospital Kohima","District Hospital Gangtok","District Hospital Panaji",
+      "District Hospital Thiruvananthapuram","District Hospital Bhopal","District Hospital Indore","District Hospital Gwalior",
+      "District Hospital Jabalpur","District Hospital Kanpur","District Hospital Varanasi","District Hospital Allahabad",
+      "District Hospital Lucknow","District Hospital Meerut","District Hospital Moradabad","District Hospital Aligarh",
+      "District Hospital Noida","District Hospital Ghaziabad","District Hospital Faridabad","District Hospital Gurgaon",
+      "District Hospital Rohtak","District Hospital Ambala","District Hospital Panchkula","District Hospital Ludhiana",
+      "District Hospital Amritsar","District Hospital Jalandhar","District Hospital Patiala","District Hospital Bathinda",
+      "District Hospital Mohali","District Hospital Chandigarh"
+    ];
+
+    const inventory = BLOOD_GROUPS.map(g=>({
+      group: g,
+      units: Math.floor(Math.random()*40)+10,
+      hospital: r(HOSPITALS)
+    }));
+
+    // -------- Helpers --------
+    function r(arr){return arr[Math.floor(Math.random()*arr.length)]}
+    function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10)}
+    function el(tag,attrs={},children=[]) {const e=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k==="class")e.className=v;else if(k==="html")e.innerHTML=v;else e.setAttribute(k,v)});children.forEach(c=>e.appendChild(c));return e}
+    function scrollToId(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})}
+
+    // -------- Populate selects --------
+    const fg=document.getElementById('filter-group');
+    BLOOD_GROUPS.forEach(g=>fg.appendChild(el('option',{value:g,html:g})));
+    const fc=document.getElementById('filter-city');
+    CITIES.forEach(c=>fc.appendChild(el('option',{value:c,html:c})));
+
+    document.querySelectorAll('select[name="group"], select[name="req_group"]').forEach(s=>{
+      s.appendChild(el('option',{value:'',html:'Select'}));
+      BLOOD_GROUPS.forEach(g=>s.appendChild(el('option',{value:g,html:g})));
+      s.value='';
+    });
+    document.querySelectorAll('select[name="city"]').forEach(s=>{
+      s.appendChild(el('option',{value:'',html:'Select'}));
+      CITIES.forEach(c=>s.appendChild(el('option',{value:c,html:c})));
+      s.value='';
+    });
+    // Populate hospital select in blood request form
+    const hospitalSelect = document.getElementById('hospital-select');
+    if (hospitalSelect) {
+      hospitalSelect.appendChild(el('option',{value:'',html:'Select'}));
+      HOSPITALS.forEach(h=>hospitalSelect.appendChild(el('option',{value:h,html:h})));
+      hospitalSelect.value = '';
+    }
+
+    // -------- Render inventory --------
+    const invGrid=document.getElementById('inventory-grid');
+    function renderInventory(){
+      invGrid.innerHTML='';
+      inventory.forEach(row=>{
+        const status=row.units<20?['Low','low']:['OK','ok'];
+        const card=el('div',{class:'card pad fade-up'});
+        card.innerHTML=`
+          <div class="between"><span class="chip" style="background:var(--rose-50);color:var(--rose-600);font-weight:700">${row.group}</span>
+          <span class="chip ${status[1]}">${status[0]}</span></div>
+          <div style="margin-top:.4rem;font-size:1.6rem;font-weight:800">${row.units} <span style="font-size:.9rem;font-weight:500;color:var(--gray-500)">units</span></div>
+          <div class="row muted" style="margin-top:.2rem"><span>🏥</span>${row.hospital}</div>`;
+        invGrid.appendChild(card);
+      });
+      revealOnScroll();
+    }
+
+    // -------- Render donors --------
+    const donorGrid=document.getElementById('donor-grid');
+    const search=document.getElementById('search');
+    function renderDonors(){
+      donorGrid.innerHTML='';
+      const q=(search.value||'').toLowerCase();
+      const g=fg.value,c=fc.value;
+      donors.filter(d=>
+        (g==='ALL'||d.group===g)&&
+        (c==='ALL'||d.city===c)&&
+        ((String(d.name||'') + ' ' + String(d.group||'') + ' ' + String(d.city||'') + ' ' + String(d.phone||'') + ' ' + String(d.email||'')).toLowerCase().includes(q))
+      ).forEach(d=>{
+          const card=el('div',{class:'card pad donor-card fade-up'});
+          let phoneBlur = '<span style="filter:blur(4px);user-select:none">'+d.phone+'</span> <span class="chip" style="background:var(--gray-100);color:var(--rose-600);margin-left:.4rem">Members Only</span>';
+          let emailBlur = '<span style="filter:blur(4px);user-select:none">'+d.email+'</span> <span class="chip" style="background:var(--gray-100);color:var(--rose-600);margin-left:.4rem">Members Only</span>';
+          card.innerHTML=`
+            <div class="between">
+              <div>
+                <div class="row" style="gap:.5rem"><strong style="font-size:1.05rem">${d.name}</strong> <span class="chip" style="background:var(--rose-600);color:#fff">${d.group}</span></div>
+                <div class="row muted" style="margin-top:.2rem">📍 ${d.city}</div>
+                <div class="muted" style="display:grid;margin-top:.2rem">
+                  <span class="row">📞 ${phoneBlur}</span>
+                  <span class="row">✉ ${emailBlur}</span>
+                </div>
+              </div>
+              <span class="chip ${d.available?'avail':'busy'}">${d.available?'Available':'Busy'}</span>
+            </div>
+            <div class="muted row" style="margin-top:.4rem">🗓 Last donation: ${d.lastDonation}</div>
+            <div class="row" style="margin-top:.6rem">
+              <button class="btn outline" onclick="showMembershipModal()">Call</button>
+              <button class="btn" onclick="showMembershipModal()">Message</button>
+            </div>`;
+          donorGrid.appendChild(card);
+      });
+      document.getElementById('kpi-donors').textContent = String(donors.length);
+      revealOnScroll();
+    }
+
+    // Filter listeners
+    [fg,fc,search].forEach(elm=>elm.addEventListener('input',renderDonors));
+
+    // -------- Forms logic --------
+    document.getElementById('form-donor').addEventListener('submit',e=>{
+      e.preventDefault();
+      const fd=new FormData(e.target);
+      const name=String(fd.get('name')||'').trim();
+      const group=String(fd.get('group')||'');
+      const city=String(fd.get('city')||'');
+      const phone=String(fd.get('phone')||'');
+      const email=String(fd.get('email')||'');
+      if(!name||!group||!city||!phone||!email){alert('Please fill all donor fields');return}
+      // Try Node API first, then fallback to PHP endpoint and finally local fallback
+      (async ()=>{
+        try{
+          const r = await fetch(API_BASE + '/api/donors', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, group, city, phone, email }) });
+          if(r.ok){ const j = await r.json(); donors.unshift({ id:j.id || Date.now(), name, group, city, phone, email, lastDonation:j.lastDonation||null, available:true }); e.target.reset(); renderDonors(); toast(`Donor ${name} added (node)`); return }
+        }catch(e){ console.warn('Node API POST /api/donors failed', e) }
+        try{
+          const res = await fetch('http://localhost/donour/donors.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, group, city, phone, email }) });
+          if(res.ok){ const j = await res.json(); donors.unshift({ id:j.id || Date.now(), name, group, city, phone, email, lastDonation:null, available:true }); e.target.reset(); renderDonors(); toast(`Donor ${name} added (php)`); return }
+        }catch(err){ console.warn('donors.php unreachable, using local fallback', err); }
+        donors.unshift({id:donors.length+1,name,group,city,phone,email,lastDonation:daysAgo(90),available:true});
+        e.target.reset(); renderDonors(); toast(`Donor ${name} added (local)`);
+      })();
+    });
+
+    document.getElementById('form-request').addEventListener('submit',e=>{
+      e.preventDefault();
+      const fd=new FormData(e.target);
+      const group=String(fd.get('req_group')||'');
+      const units=Number(fd.get('units')||1);
+  const hospital=String(fd.get('hospital')||'').trim()||'City General Hospital';
+      if(!group || !(units>0)){alert('Please provide valid group and units.');return}
+      const row=inventory.find(r=>r.group===group); if(row){row.units=Math.max(0,row.units-units); row.hospital=hospital}
+      e.target.reset();
+      renderInventory();
+      toast(`Request created for ${units} unit(s) of ${group}`);
+      showOrderModal(group, units, hospital);
+    });
+
+    // -------- Tiny toast --------
+    function toast(msg){
+      let t=document.getElementById('toast');
+      if(!t){t=el('div',{id:'toast'});document.body.appendChild(t);Object.assign(t.style,{position:'fixed',left:'50%',bottom:'24px',transform:'translateX(-50%)',background:'#111827',color:'#fff',padding:'10px 14px',borderRadius:'12px',boxShadow:'var(--shadow-1)',opacity:'0',transition:'opacity .25s, transform .25s ease',zIndex:9999})}
+      t.textContent=msg; t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(-6px)';
+      setTimeout(()=>{t.style.opacity='0'; t.style.transform='translateX(-50%)'},1600);
+    }
+
+    // -------- Reveal on scroll --------
+    const io=new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+    },{threshold:.12});
+    function revealOnScroll(){ document.querySelectorAll('.fade-up:not(.in)').forEach(el=>io.observe(el)); }
+
+    // Init
+    document.getElementById('year').textContent=String(new Date().getFullYear());
+
+    // ---- Full account handling (localStorage-backed demo) ----
+    let currentUser = null;
+
+    function isSignedIn(){ return !!sessionStorage.getItem('donour_auth') }
+
+    function toggleProfileMenu(){
+      // simple placeholder for future menu
+      alert('Profile menu — ' + (currentUser ? currentUser.name : 'Not signed in'))
+    }
+
+    function showLogoutInNav(){
+      const actions = document.querySelector('.nav-actions') || document.querySelector('.nav-inner');
+      if(!actions) return;
+      if(document.getElementById('nav-logout')) return;
+      const btn = document.createElement('button'); btn.id='nav-logout'; btn.className='btn outline'; btn.textContent='Logout';
+      btn.onclick = doLogout;
+      actions.appendChild(btn);
+    }
+
+    // Tab switching for login/signup
+    document.getElementById('tab-signin').addEventListener('click', ()=>{
+      document.getElementById('tab-signin').className='btn';
+      document.getElementById('tab-signup').className='btn outline';
+      document.getElementById('signin-form').style.display='block';
+      document.getElementById('signup-form').style.display='none';
+    });
+    document.getElementById('tab-signup').addEventListener('click', ()=>{
+      document.getElementById('tab-signup').className='btn';
+      document.getElementById('tab-signin').className='btn outline';
+      document.getElementById('signin-form').style.display='none';
+      document.getElementById('signup-form').style.display='block';
+    });
+
+    // Populate signup selects
+    const signupGroup = document.getElementById('signup-group');
+    const signupCity = document.getElementById('signup-city');
+    BLOOD_GROUPS.forEach(g => signupGroup.add(new Option(g, g)));
+    CITIES.forEach(c => signupCity.add(new Option(c, c)));
+
+    // --- API token helpers (used when server is available) ---
+    const API_BASE = 'http://127.0.0.1:3001';
+    function setApiToken(t){ if(t) localStorage.setItem('donour_api_token', t); else localStorage.removeItem('donour_api_token'); }
+    function getApiToken(){ return localStorage.getItem('donour_api_token'); }
+    async function authFetch(path, opts={}){
+      opts.headers = opts.headers || {};
+      const token = getApiToken();
+      if(token) opts.headers['Authorization'] = 'Bearer ' + token;
+      const url = path.startsWith('http') ? path : (API_BASE + path);
+      return fetch(url, opts);
+    }
+
+    // Signup handler
+    document.getElementById('signup-btn').addEventListener('click', ()=>{
+      const name = document.getElementById('signup-name').value.trim();
+      const group = document.getElementById('signup-group').value;
+      const city = document.getElementById('signup-city').value;
+      const phone = document.getElementById('signup-phone').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const username = document.getElementById('signup-user').value.trim();
+      const password = document.getElementById('signup-pass').value;
+      if(!name||!group||!city||!phone||!email||!username||!password){ toast('Please fill all fields'); return }
+      // Try server signup first
+      (async ()=>{
+          try{
+            const res = await fetch(API_BASE + '/api/signup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, username, email, password, group, city, phone }) });
+          if(res.ok){
+            const j = await res.json();
+            // server returns user and token
+            const user = j.user;
+            // keep local preview
+            donors.unshift({ id:user.id, name:user.name, group:user.group, city:user.city, phone:user.phone, email:user.email, lastDonation:user.lastDonation||null, available:true });
+            // store server token if provided
+            if(j.token) setApiToken(j.token);
+            loginUser(user);
+            toast('Account created (server)');
+            return;
+          }
+          // fallback to local behavior on non-ok — read response text to aid debugging
+          try{
+            const txt = await res.text();
+            console.warn('Signup server returned', res.status, txt);
+            toast('Signup server error: ' + (txt || res.status));
+          }catch(e){
+            console.warn('Signup server returned', res.status);
+            toast('Signup server returned status ' + res.status);
+          }
+  }catch(e){ console.warn('Signup API unreachable, falling back to local', e); toast('Network error: ' + (e && e.message || e)); }
+        // Fallback: localStorage-based signup
+        const users = JSON.parse(localStorage.getItem('donour_users')||'[]');
+        if(users.find(u=>u.username===username)){ toast('Username already taken'); return }
+        const user = { id: Date.now(), name, group, city, phone, email, username, password: btoa(password), lastDonation:null, available:true };
+        users.push(user); localStorage.setItem('donour_users', JSON.stringify(users));
+        donors.unshift({ id:user.id, name:user.name, group:user.group, city:user.city, phone:user.phone, email:user.email, lastDonation:user.lastDonation, available:user.available });
+        loginUser(user);
+        toast('Account created (local)');
+      })();
+    });
+
+    // Login handler
+    document.getElementById('login-btn').addEventListener('click', ()=>{
+      const username = document.getElementById('login-user').value.trim();
+      const password = document.getElementById('login-pass').value;
+      if(!username||!password){ toast('Please enter credentials'); return }
+      (async ()=>{
+        // try server login
+          try{
+          const res = await fetch(API_BASE + '/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+          if(res.ok){
+            const j = await res.json();
+            const user = j.user;
+            // store server token in localStorage for API calls
+            if(j.token) setApiToken(j.token);
+            loginUser(user);
+            toast('Signed in (server)');
+            return;
+          }
+        }catch(e){ console.warn('Login API unreachable — falling back to local', e); }
+        // fallback to localStorage demo login
+        const users = JSON.parse(localStorage.getItem('donour_users')||'[]');
+        const user = users.find(u => u.username === username && u.password === btoa(password));
+        if(!user){ toast('Invalid credentials'); return }
+        loginUser(user);
+        toast('Signed in (local)');
+      })();
+    });
+
+    function loginUser(user){
+      currentUser = user;
+      const token = btoa(JSON.stringify({ id:user.id, username:user.username, name:user.name }));
+      if(document.getElementById('remember-me')?.checked) localStorage.setItem('donour_auth_token', token);
+      sessionStorage.setItem('donour_auth', token);
+      document.getElementById('login-overlay').style.display='none';
+      document.getElementById('profile-menu').style.display='flex';
+      document.getElementById('profile-name').textContent = user.name;
+      showLogoutInNav(); renderInventory(); renderDonors(); revealOnScroll(); renderSharedLocations();
+      toast('Welcome ' + user.name);
+    }
+
+  function doLogout(){ setApiToken(null); currentUser = null; sessionStorage.removeItem('donour_auth'); localStorage.removeItem('donour_auth_token'); document.getElementById('login-overlay').style.display='flex'; document.getElementById('profile-menu').style.display='none'; const btn=document.getElementById('nav-logout'); if(btn)btn.remove(); toast('Signed out'); }
+
+    // Auto restore
+    (function restore(){
+      // Prefer server token session if available
+      const apiToken = getApiToken();
+      if(apiToken){
+        // try to restore from server /api/me
+        (async ()=>{
+          try{
+            const res = await authFetch('/api/me');
+            if(res.ok){ const j = await res.json(); loginUser(j.user); return; }
+          }catch(e){ console.warn('API /me unreachable', e); }
+          // fallback to local restore below
+          const token = sessionStorage.getItem('donour_auth') || localStorage.getItem('donour_auth_token');
+          if(!token) { document.getElementById('login-overlay').style.display='flex'; return }
+          try{ const u = JSON.parse(atob(token)); const users = JSON.parse(localStorage.getItem('donour_users')||'[]'); const found = users.find(x=>x.id===u.id); if(found) { loginUser(found); } else { document.getElementById('login-overlay').style.display='flex'; } }catch(e){ document.getElementById('login-overlay').style.display='flex'; }
+        })();
+        return;
+      }
+      const token = sessionStorage.getItem('donour_auth') || localStorage.getItem('donour_auth_token');
+      if(!token) { document.getElementById('login-overlay').style.display='flex'; return }
+      try{
+        const u = JSON.parse(atob(token));
+        const users = JSON.parse(localStorage.getItem('donour_users')||'[]');
+        const found = users.find(x=>x.id===u.id);
+        if(found) { loginUser(found); } else { document.getElementById('login-overlay').style.display='flex'; }
+      }catch(e){ document.getElementById('login-overlay').style.display='flex'; }
+    })();
+
+    // Auto-logout when page hidden (keep remembered token)
+    function clearSessionAuth(){ sessionStorage.removeItem('donour_auth'); }
+    window.addEventListener('pagehide', clearSessionAuth); window.addEventListener('beforeunload', clearSessionAuth); window.addEventListener('unload', clearSessionAuth);
+
+    // ---- Profile dropdown & edit handlers ----
+    function toggleProfileMenu(e){
+      const dd = document.getElementById('profile-dropdown');
+      if(!dd) return;
+      dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+      if(dd.style.display === 'block') populateProfileDropdown();
+    }
+
+    function populateProfileDropdown(){
+      if(!currentUser) return;
+      document.getElementById('pd-name').textContent = currentUser.name || currentUser.username;
+      document.getElementById('pd-phone').textContent = currentUser.phone || '—';
+      document.getElementById('pd-email').textContent = currentUser.email || '—';
+      const badge = document.getElementById('pd-badge');
+      badge.textContent = (currentUser.member === 'premium') ? 'Premium' : 'Free';
+      badge.style.background = (currentUser.member === 'premium') ? 'linear-gradient(90deg,#f43f5e,#fb7185)' : '#f3f4f6';
+      badge.style.color = (currentUser.member === 'premium') ? '#fff' : 'var(--rose-600)';
+      // Extra info for premium users
+      const extra = document.getElementById('pd-extra');
+      if(currentUser.member === 'premium') {
+        extra.innerHTML = '<div style="font-weight:700">Premium Member</div><div class="muted">Access to full contact info, priority support.</div>';
+      } else {
+        extra.innerHTML = '<div class="muted">Upgrade to premium to view full contact info.</div>';
+      }
+      // If server token exists, try to load pending payments for this user
+      (async ()=>{
+        try{
+          const api = getApiToken();
+          if(!api) return;
+          const r = await authFetch('/api/membership');
+          if(!r) return;
+          const j = await r.json();
+          // filter payments for current user that are pending or awaiting_verification
+          const my = (j||[]).filter(p=>String(p.userId)===String(currentUser.id) && (p.status==='pending' || p.status==='awaiting_verification'));
+          if(my.length){
+            const list = my.map(p=>`<div style="margin-top:.5rem;border-top:1px dashed #eee;padding-top:.5rem"><div style="font-weight:700">Payment #${p.id} — ₹${p.amount}</div><div class="muted">Status: ${p.status}</div><div style="margin-top:.4rem"><input placeholder="Enter txn ref" data-payid="${p.id}" style="width:100%;padding:.4rem;border-radius:8px;border:1px solid #e6e8eb"/><button class="btn" data-payid="${p.id}" style="width:100%;margin-top:.4rem">Submit Txn Ref</button></div></div>`).join('');
+            extra.innerHTML += `<div style="margin-top:.6rem">${list}</div>`;
+            // attach handlers
+            setTimeout(()=>{
+              extra.querySelectorAll('button[data-payid]').forEach(b=> b.addEventListener('click', async (ev)=>{
+                const pid = b.getAttribute('data-payid');
+                const inp = extra.querySelector(`input[data-payid="${pid}"]`);
+                const v = inp.value.trim(); if(!v){ toast('Enter txn reference'); return }
+                try{
+                  const r2 = await authFetch('/api/membership/confirm',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ paymentId: pid, txRef: v }) });
+                  if(r2){ const j2 = await r2.json(); if(j2 && j2.ok){ toast('Submitted for verification'); inp.value=''; } else toast('Submit failed'); }
+                }catch(e){ console.warn(e); toast('Submit failed'); }
+              }));
+            }, 200);
+          }
+        }catch(e){ /* ignore */ }
+      })();
+    }
+
+    // Wire dropdown buttons
+    document.addEventListener('click', (ev)=>{
+      const t = ev.target;
+      if(t && t.id === 'pd-logout'){ doLogout(); }
+      if(t && t.id === 'pd-edit'){ showEditProfile(); }
+    });
+
+    function showEditProfile(){
+      if(!currentUser) return toast('Not signed in');
+      document.getElementById('edit-profile-modal').style.display='flex';
+      // populate
+      document.getElementById('edit-name').value = currentUser.name || '';
+      const eg = document.getElementById('edit-group'); eg.innerHTML=''; BLOOD_GROUPS.forEach(g=>eg.add(new Option(g,g))); eg.value = currentUser.group || '';
+      const ec = document.getElementById('edit-city'); ec.innerHTML=''; CITIES.forEach(c=>ec.add(new Option(c,c))); ec.value = currentUser.city || '';
+      document.getElementById('edit-phone').value = currentUser.phone || '';
+      document.getElementById('edit-email').value = currentUser.email || '';
+    }
+
+    document.getElementById('cancel-profile').addEventListener('click', ()=>{ document.getElementById('edit-profile-modal').style.display='none'; });
+    document.getElementById('save-profile').addEventListener('click', ()=>{
+      const name = document.getElementById('edit-name').value.trim();
+      const group = document.getElementById('edit-group').value;
+      const city = document.getElementById('edit-city').value;
+      const phone = document.getElementById('edit-phone').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      if(!name||!group||!city||!phone||!email) { toast('Please fill all fields'); return }
+      // update local user store
+      const users = JSON.parse(localStorage.getItem('donour_users')||'[]');
+      const idx = users.findIndex(u=>u.id===currentUser.id);
+      if(idx===-1){ toast('User not found'); return }
+      users[idx] = Object.assign(users[idx], { name, group, city, phone, email });
+      localStorage.setItem('donour_users', JSON.stringify(users));
+      currentUser = users[idx];
+      // update donors list
+      const di = donors.findIndex(d=>d.id===currentUser.id);
+      if(di>=0) donors[di] = Object.assign(donors[di], { name: currentUser.name, group: currentUser.group, city: currentUser.city, phone: currentUser.phone, email: currentUser.email });
+      renderDonors();
+      document.getElementById('edit-profile-modal').style.display='none';
+      populateProfileDropdown();
+      toast('Profile updated');
+    });
+
+    // ---- Password reset flow (client-side demo) ----
+    function generateToken(){ return Math.random().toString(36).slice(2,10).toUpperCase(); }
+
+    document.getElementById('forgot-link').addEventListener('click', (e)=>{
+      e.preventDefault(); document.getElementById('pw-request-panel').style.display='flex';
+    });
+
+    document.getElementById('pw-req-cancel').addEventListener('click', ()=>{ document.getElementById('pw-request-panel').style.display='none'; });
+    document.getElementById('pw-reset-cancel').addEventListener('click', ()=>{ document.getElementById('pw-reset-panel').style.display='none'; });
+
+    document.getElementById('send-token-btn').addEventListener('click', ()=>{
+      const email = document.getElementById('pw-req-email').value.trim(); if(!email) return toast('Enter your email');
+      (async ()=>{
+        // Try server request
+        try{
+          const res = await fetch('http://localhost:3001/api/password/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+          if(res.ok){ document.getElementById('pw-req-info').textContent='Reset token sent (server) — check email-log.txt in server folder (demo).'; setTimeout(()=>{ document.getElementById('pw-request-panel').style.display='none'; document.getElementById('pw-reset-panel').style.display='flex'; document.getElementById('pw-reset-info').textContent = 'Enter the token you received (server logged).'; }, 700); return; }
+        }catch(e){ console.warn('Password request API unreachable, falling back to local', e); }
+        // local fallback
+        const users = JSON.parse(localStorage.getItem('donour_users')||'[]');
+        const user = users.find(u=>u.email===email);
+        if(!user){ document.getElementById('pw-req-info').textContent='No account found for that email.'; return }
+        const token = generateToken();
+        const tokens = JSON.parse(localStorage.getItem('pw_tokens')||'{}'); tokens[user.email]= { token, ts:Date.now() }; localStorage.setItem('pw_tokens', JSON.stringify(tokens));
+        document.getElementById('pw-req-info').innerHTML = `Reset token (demo): <strong>${token}</strong> — copy and use below`;
+        setTimeout(()=>{ document.getElementById('pw-request-panel').style.display='none'; document.getElementById('pw-reset-panel').style.display='flex'; document.getElementById('pw-reset-info').textContent = 'Paste the token you received (demo).'; }, 800);
+      })();
+    });
+
+    document.getElementById('pw-reset-btn').addEventListener('click', ()=>{
+      const token = document.getElementById('pw-token').value.trim(); const pw = document.getElementById('pw-new').value;
+      if(!token||!pw) return toast('Enter token and new password');
+      (async ()=>{
+        // Try server reset
+        try{
+          const res = await fetch('http://localhost:3001/api/password/reset', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token, password: pw, email: document.getElementById('pw-req-email').value.trim() }) });
+          if(res.ok){ document.getElementById('pw-reset-info').textContent='Password reset (server). You can now sign in.'; setTimeout(()=>{ document.getElementById('pw-reset-panel').style.display='none'; }, 1200); return; }
+        }catch(e){ console.warn('Password reset API unreachable — falling back to local', e); }
+        // local fallback
+        const tokens = JSON.parse(localStorage.getItem('pw_tokens')||'{}');
+        const entry = Object.entries(tokens).find(([email,obj])=>obj && obj.token===token);
+        if(!entry){ document.getElementById('pw-reset-info').textContent='Invalid or expired token'; return }
+        const email = entry[0];
+        const users = JSON.parse(localStorage.getItem('donour_users')||'[]'); const idx = users.findIndex(u=>u.email===email);
+        if(idx===-1){ document.getElementById('pw-reset-info').textContent='User not found'; return }
+        users[idx].password = btoa(pw); localStorage.setItem('donour_users', JSON.stringify(users));
+        delete tokens[email]; localStorage.setItem('pw_tokens', JSON.stringify(tokens));
+        document.getElementById('pw-reset-info').textContent='Password reset. You can now sign in.';
+        setTimeout(()=>{ document.getElementById('pw-reset-panel').style.display='none'; }, 1200);
+      })();
+    });
+
+      // -------- Membership Modal --------
+      window.showMembershipModal = function() {
+        let m = document.getElementById('membership-modal');
+        if (m) document.body.removeChild(m);
+  m = el('div', {id:'membership-modal'});
+  m.classList.add('plan-modal');
+        Object.assign(m.style, {
+          position:'fixed',top:0,left:0,width:'100vw',height:'100vh',
+          background:'rgba(0,0,0,.32)',zIndex:99999,display:'flex',
+          alignItems:'center',justifyContent:'center'
+        });
+
+        const plans = [
+          {
+            id:'Silver', name:'Silver', price:299, color:'#f43f5e',
+            points: [
+              'Access donor contact info (blurred)',
+              'Priority support'
+            ]
+          },
+          {
+            id:'Gold', name:'Gold', price:599, color:'#fb7185',
+            points: [
+              'Full contact info',
+              'Faster blood ordering',
+              'Exclusive offers'
+            ]
+          },
+          {
+            id:'Platinum', name:'Platinum', price:999, color:'#e11d48',
+            points: [
+              'All Gold benefits',
+              'Free order processing',
+              'Premium support'
+            ]
+          }
+        ];
+        const methods = [
+          {id:'GPay', name:'GPay', icon:'<svg width="22" height="22" viewBox="0 0 48 48"><g><circle cx="24" cy="24" r="24" fill="#fff"/><path d="M24 9a15 15 0 1 0 0 30 15 15 0 0 0 0-30Zm0 27.5A12.5 12.5 0 1 1 24 11a12.5 12.5 0 0 1 0 25Z" fill="#4285F4"/><path d="M24 11v25a12.5 12.5 0 0 0 0-25Z" fill="#34A853"/><path d="M24 11v25a12.5 12.5 0 0 0 0-25Z" fill="#FBBC05"/><path d="M24 11v25a12.5 12.5 0 0 0 0-25Z" fill="#EA4335"/></g></svg>'},
+          {id:'Paytm', name:'Paytm', icon:'<svg width="22" height="22" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#fff"/><text x="8" y="32" font-size="18" font-family="Arial, Helvetica, sans-serif" fill="#00baf2">Paytm</text></svg>'},
+          {id:'PhonePe', name:'PhonePe', icon:'<svg width="22" height="22" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#fff"/><circle cx="24" cy="24" r="16" fill="#6f2da8"/><text x="13" y="32" font-size="18" font-family="Arial, Helvetica, sans-serif" fill="#fff">Pe</text></svg>'},
+          {id:'NetBanking', name:'Net Banking', icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="10" rx="2" stroke="#e11d48" stroke-width="2"/><rect x="7" y="11" width="2" height="2" fill="#e11d48"/><rect x="11" y="11" width="2" height="2" fill="#e11d48"/><rect x="15" y="11" width="2" height="2" fill="#e11d48"/></svg>'},
+          {id:'UPI', name:'UPI', icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="10" rx="2" stroke="#047857" stroke-width="2"/><path d="M7 17l4-10 4 10" stroke="#047857" stroke-width="2"/></svg>'},
+          {id:'Card', name:'Card', icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#6366f1" stroke-width="2"/><rect x="7" y="14" width="6" height="2" fill="#6366f1"/><circle cx="17" cy="15" r="1" fill="#6366f1"/></svg>'}
+        ];
+        let step = 1;
+        let selectedPlan = plans[0].id;
+        let selectedMethod = null;
+
+        function renderStep() {
+          let html = '';
+          if (step === 1) {
+            const plan = plans.find(p=>p.id===selectedPlan);
+            html = `
+            <div style="display:flex;gap:2.2rem;align-items:stretch;min-width:660px;max-width:820px">
+              <!-- Left: Plan Cards -->
+              <div style="flex:1;display:flex;flex-direction:column;gap:1.1rem;justify-content:center">
+                ${plans.map(p=>`
+                  <div class="plan-card" data-plan="${p.id}" style="
+                    cursor:pointer;transition:box-shadow .3s,transform .3s;
+                    background:${selectedPlan===p.id?p.color+'10':'#fff'};
+                    border:2.5px solid ${selectedPlan===p.id?p.color:'#e5e7eb'};
+                    box-shadow:${selectedPlan===p.id?`0 8px 32px ${p.color}33,0 2px 12px ${p.color}22`:'0 2px 12px #0001'};
+                    border-radius:22px;padding:1.2rem 1.3rem;min-width:170px;max-width:210px;text-align:center;transform:${selectedPlan===p.id?'scale(1.08)':'scale(1)'};position:relative;overflow:hidden;">
+                    <div style="font-size:1.2rem;font-weight:800;color:${p.color};margin-bottom:.3rem;">${p.name}</div>
+                    <div style="font-size:1.5rem;font-weight:900;margin-bottom:.2rem;color:${p.color}">₹${p.price}</div>
+                    <div style="font-size:.98rem;color:#374151;margin-bottom:.7rem;">per year</div>
+                    ${selectedPlan===p.id?'<div style="position:absolute;top:10px;right:18px;font-size:1.3rem;">⭐</div>':''}
+                  </div>
+                `).join('')}
+              </div>
+              <!-- Right: Plan Details -->
+              <div style="flex:2;display:flex;flex-direction:column;justify-content:center;min-width:260px">
+                <div style="font-size:1.3rem;font-weight:800;margin-bottom:.6rem;color:${plan.color}">${plan.name} Membership</div>
+                <div class="muted" style="margin-bottom:.7rem;font-size:1.05rem">You get:</div>
+                <ul style="padding-left:1.2rem;margin:0 0 1.2rem 0;font-size:.98rem;color:#374151;line-height:1.5;">
+                  ${plan.points.map(pt=>`<li style="margin-bottom:.18rem;list-style:square inside;">${pt}</li>`).join('')}
+                </ul>
+                <div style="font-weight:600;margin-bottom:.4rem;">Choose Payment Method</div>
+                <div class="row" id="pay-methods" style="gap:.7rem;flex-wrap:wrap;justify-content:flex-start">
+                  ${methods.map(m=>`<button class="btn outline" data-method="${m.id}" style="border-width:2px;${selectedMethod===m.id?'border-color:#6366f1;background:#6366f110;transform:scale(1.07);box-shadow:0 2px 12px #6366f122;':''}">${m.icon} <span>${m.name}</span></button>`).join('')}
+                </div>
+                <button class="btn" id="pay-next" style="width:100%;font-size:1.1rem;padding:1.1rem 0;margin-top:.8rem;" ${selectedMethod?'':'disabled'}>Continue</button>
+                <button class="btn outline" style="margin-top:.7rem;width:100%" onclick="document.body.removeChild(document.getElementById('membership-modal'))">Cancel</button>
+              </div>
+            </div>
+            <style>
+              .plan-card:hover { box-shadow:0 8px 32px #f43f5e22,0 2px 12px #f43f5e11; transform:scale(1.04); }
+              .plan-card { transition:box-shadow .3s,transform .3s; }
+            </style>
+            `;
+          } else if (step === 2) {
+            const plan = plans.find(p=>p.id===selectedPlan);
+            const method = methods.find(m=>m.id===selectedMethod);
+            if (selectedMethod === 'Card') {
+              html = `
+                <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Card Payment</div>
+                <div class="muted" style="margin-bottom:.7rem">Pay <b>₹${plan.price}</b> for <b>${plan.name}</b> membership via <b>Card</b></div>
+                <form id="card-form" autocomplete="off" style="margin-bottom:1.2rem;text-align:left">
+                  <label style="font-weight:600;font-size:.97rem;">Card Number</label>
+                  <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456" style="width:100%;padding:.6rem .8rem;margin-bottom:.7rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9 ]*" required />
+                  <div style="display:flex;gap:.7rem;margin-bottom:.7rem">
+                    <div style="flex:1">
+                      <label style="font-weight:600;font-size:.97rem;">Expiry</label>
+                      <input type="text" id="card-expiry" maxlength="5" placeholder="MM/YY" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9/]*" required />
+                    </div>
+                    <div style="flex:1">
+                      <label style="font-weight:600;font-size:.97rem;">CVV</label>
+                      <input type="password" id="card-cvv" maxlength="4" placeholder="123" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9]*" required />
+                    </div>
+                  </div>
+                  <label style="font-weight:600;font-size:.97rem;">Name on Card</label>
+                  <input type="text" id="card-name" maxlength="32" placeholder="Cardholder Name" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem;margin-bottom:.7rem" required />
+                </form>
+                <button class="btn" id="pay-confirm" style="width:100%" disabled>Pay Now</button>
+                <button class="btn outline" style="margin-top:.7rem;width:100%" id="pay-back">Back</button>
+              `;
+            } else {
+              html = `
+                <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Confirm Payment</div>
+                <div class="muted" style="margin-bottom:.7rem">Pay <b>₹${plan.price}</b> for <b>${plan.name}</b> membership via <b>${method.name}</b></div>
+                <div style="margin-bottom:1.2rem">${method.icon}</div>
+                <button class="btn" id="pay-confirm" style="width:100%">Pay Now</button>
+                <button class="btn outline" style="margin-top:.7rem;width:100%" id="pay-back">Back</button>
+              `;
+            }
+          } else if (step === 3) {
+            html = `
+              <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Processing Payment…</div>
+              <div style="margin:1.5rem 0"><div class="spinner" style="margin:auto;width:48px;height:48px;border:5px solid #f3f3f3;border-top:5px solid #6366f1;border-radius:50%;animation:spin 1s linear infinite"></div></div>
+            `;
+          } else if (step === 4) {
+            html = `
+              <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem;color:#047857">Payment Successful!</div>
+              <div style="font-size:2.2rem;margin-bottom:.7rem">🎉</div>
+              <div class="muted" style="margin-bottom:1.2rem">Your payment for <b>${plans.find(p=>p.id===selectedPlan).name}</b> membership was successful.</div>
+              <button class="btn" style="width:100%" onclick="document.body.removeChild(document.getElementById('membership-modal'))">Done</button>
+            `;
+          }
+          m.innerHTML = `<div style="background:#fff;padding:2.2rem 2.5rem;border-radius:28px;box-shadow:var(--shadow-1);animation:fadeInUp .5s cubic-bezier(.4,1.4,.6,1) both">${html}</div>`;
+          // Add spinner and fade animation style
+          if (!document.getElementById('pay-spin-style')) {
+            const style = document.createElement('style');
+            style.id = 'pay-spin-style';
+            style.innerHTML = `@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}@keyframes fadeInUp{0%{opacity:0;transform:translateY(32px);}100%{opacity:1;transform:none;}}`;
+            document.head.appendChild(style);
+          }
+          // Step 1 listeners
+          if (step === 1) {
+            m.querySelectorAll('.plan-card').forEach(card => {
+              card.onclick = function() {
+                selectedPlan = this.getAttribute('data-plan');
+                renderStep();
+              };
+            });
+            m.querySelectorAll('[data-method]').forEach(btn => {
+              btn.onclick = function() {
+                selectedMethod = this.getAttribute('data-method');
+                renderStep();
+              };
+            });
+            m.querySelector('#pay-next').onclick = function() {
+              if (selectedMethod) { step = 2; renderStep(); }
+            };
+          }
+          // Step 2 listeners
+          if (step === 2) {
+            if (selectedMethod === 'Card') {
+              // Card form validation
+              const cardNumber = m.querySelector('#card-number');
+              const cardExpiry = m.querySelector('#card-expiry');
+              const cardCVV = m.querySelector('#card-cvv');
+              const cardName = m.querySelector('#card-name');
+              const payBtn = m.querySelector('#pay-confirm');
+              function validateCard() {
+                const num = cardNumber.value.replace(/\s+/g, '');
+                const exp = cardExpiry.value;
+                const cvv = cardCVV.value;
+                const name = cardName.value.trim();
+                let valid = num.length === 16 && /^\d{2}\/\d{2}$/.test(exp) && (cvv.length === 3 || cvv.length === 4) && name.length > 0;
+                payBtn.disabled = !valid;
+              }
+              [cardNumber, cardExpiry, cardCVV, cardName].forEach(input => {
+                input.addEventListener('input', validateCard);
+              });
+              cardNumber.addEventListener('input', function(e) {
+                let v = this.value.replace(/[^\d]/g, '').slice(0,16);
+                this.value = v.replace(/(.{4})/g, '$1 ').trim();
+              });
+              cardExpiry.addEventListener('input', function(e) {
+                let v = this.value.replace(/[^\d]/g, '').slice(0,4);
+                if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+                this.value = v;
+              });
+              payBtn.onclick = function() {
+                step = 3; renderStep();
+                // Open Razorpay checkout for the card payment
+                (async ()=>{
+                  try{
+                    await openRazorpayCheckout(plan.price);
+                    // show success
+                    step = 4; renderStep();
+                  }catch(e){
+                    console.error('Card payment failed', e);
+                    toast('Card payment failed: ' + (e && e.message || e));
+                    // return to step 2 to allow retry
+                    step = 2; renderStep();
+                  }
+                })();
+              };
+              m.querySelector('#pay-back').onclick = function() {
+                step = 1; renderStep();
+              };
+            } else {
+              m.querySelector('#pay-confirm').onclick = async function() {
+                // Ensure user is logged in
+                const token = getApiToken();
+                if(!token){ toast('Please sign in to continue'); document.getElementById('login-overlay').style.display='flex'; return }
+                // Create payment record on server and get UPI deep link
+                try{
+                  const resp = await authFetch('/api/membership/create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: plan.price, method: selectedMethod }) });
+                  if(!resp){ toast('Payment init failed'); return }
+                  const j = await resp.json();
+                  if(!j || !j.ok){ toast('Payment init failed: '+(j && j.error || 'unknown')); return }
+                  const upi = j.upi;
+                  // Show QR inline and provide copy/intent options
+                  let qdiv = m.querySelector('#membership-qr');
+                  if(!qdiv){ qdiv = document.createElement('div'); qdiv.id = 'membership-qr'; qdiv.style.textAlign = 'center'; qdiv.style.marginTop = '.9rem'; m.querySelector('div').appendChild(qdiv); }
+                  const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=240x240&chl=' + encodeURIComponent(upi);
+                  // Android intent links for Google Pay and PhonePe (work on mobile Chrome)
+                  const gpayIntent = `intent://upi/pay?pa=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('pa') )}&pn=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('pn') )}&am=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('am') )}&cu=INR#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+                  const phonepeIntent = `intent://upi/pay?pa=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('pa') )}&pn=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('pn') )}&am=${encodeURIComponent( (new URLSearchParams(upi.split('?')[1])).get('am') )}&cu=INR#Intent;scheme=upi;package=com.phonepe.app;end`;
+                  qdiv.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem">
+                      <img src="${qrUrl}" style="width:220px;height:220px;border-radius:12px;border:1px solid #eee"/>
+                      <div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.4rem">
+                        <a class="btn" href="${upi}" target="_blank">Open in UPI app</a>
+                        <a class="btn outline" href="${gpayIntent}">Open in Google Pay (Android)</a>
+                        <a class="btn outline" href="${phonepeIntent}">Open in PhonePe (Android)</a>
+                        <button class="btn outline" id="copy-upi-btn">Copy UPI link</button>
+                        <a class="btn outline" id="share-wa" href="https://wa.me/?text=${encodeURIComponent('Please pay via UPI: '+upi)}" target="_blank">Share via WhatsApp</a>
+                        <a class="btn outline" id="share-tg" href="https://t.me/share/url?url=${encodeURIComponent(upi)}&text=${encodeURIComponent('Please pay via UPI: '+upi)}" target="_blank">Share via Telegram</a>
+                      </div>
+                      <div class="muted" style="font-size:.9rem">Or scan the QR with your UPI app (use your phone). If you're on desktop, use Copy to send the link to your phone.</div>
+                    </div>`;
+                  // copy button handler
+                  qdiv.querySelector('#copy-upi-btn').onclick = function(){ navigator.clipboard.writeText(upi).then(()=>toast('UPI link copied to clipboard'), ()=>toast('Copy failed')); };
+                  // If server returned mock mode (no Razorpay keys), show simulate button
+                  if(j && j.mock){
+                    let simBtn = document.createElement('button'); simBtn.className='btn'; simBtn.textContent='Simulate Success'; simBtn.style.marginTop='.6rem';
+                    simBtn.onclick = async function(){ try{ const r = await authFetch('/api/membership/mock-verify',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ paymentId: j.payment.id }) }); const rr = await r.json(); if(r.ok) { toast('Payment simulated, membership active'); loginUser(rr.user); } else toast('Simulate failed'); }catch(e){ console.error(e); toast('Simulate error'); } };
+                    qdiv.appendChild(simBtn);
+                  }
+                  // Prompt to enter transaction reference (quick flow)
+                  setTimeout(()=>{
+                    const tx = prompt('After payment, paste the UPI transaction reference/ID here to submit for verification (or cancel).');
+                    if(tx && tx.trim()){ (async ()=>{
+                      try{
+                        const r2 = await authFetch('/api/membership/confirm', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ paymentId: j.payment.id, txRef: tx.trim() }) });
+                        if(r2){ const j2 = await r2.json(); if(j2 && j2.ok){ toast('Reference submitted for verification'); } else toast('Failed to submit reference'); }
+                      }catch(e){ console.warn('confirm failed', e); toast('Failed to submit reference'); }
+                    })(); } else { toast('You can submit reference later from your profile'); }
+                  }, 600);
+                }catch(e){ console.error(e); toast('Payment flow failed: ' + (e && e.message || e)); }
+              };
+              m.querySelector('#pay-back').onclick = function() {
+                step = 1; renderStep();
+              };
+            }
+          }
+        }
+        renderStep();
+        document.body.appendChild(m);
+      }
+
+      // Razorpay helpers (open checkout, verify)
+      async function loadRazorpayScript(){
+        if(window.Razorpay) return true;
+        return new Promise((resolve,reject)=>{
+          const s = document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js'; s.onload=()=>resolve(true); s.onerror=()=>reject(new Error('failed to load razorpay')); document.head.appendChild(s);
+        });
+      }
+
+      async function openRazorpayCheckout(amount){
+        // amount in rupees
+        const cfgResp = await fetch(API_BASE + '/api/config/razorpay');
+        if(!cfgResp.ok) throw new Error('razorpay not configured');
+        const cfg = await cfgResp.json();
+        if(!cfg.key_id) throw new Error('missing key_id');
+        // create order
+        const createRes = await authFetch('/api/membership/razorpay/create-order', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount }) });
+        if(!createRes.ok){ const txt = await createRes.text().catch(()=>null); throw new Error('order creation failed: '+(txt||createRes.status)); }
+        const body = await createRes.json();
+        await loadRazorpayScript();
+        return new Promise((resolve,reject)=>{
+          const options = {
+            key: cfg.key_id,
+            amount: Math.round(amount*100),
+            currency: 'INR',
+            name: 'Donour Hub',
+            description: 'Membership',
+            order_id: body.order.id,
+            handler: async function(resp){
+              try{
+                const verifyRes = await authFetch('/api/membership/razorpay/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ razorpay_order_id: resp.razorpay_order_id, razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature, paymentId: body.payment.id }) });
+                const vr = await verifyRes.json();
+                if(verifyRes.ok){ toast('Payment verified'); resolve(vr); } else { reject(vr); }
+              }catch(e){ reject(e); }
+            },
+            modal: { ondismiss: function(){ reject(new Error('checkout dismissed')); } },
+          };
+          const rzp = new Razorpay(options);
+          rzp.open();
+        });
+      }
+
+      // -------- Order Modal --------
+      window.showOrderModal = function(group, units, hospital) {
+        let o = document.getElementById('order-modal');
+        if (o) document.body.removeChild(o);
+  o = el('div', {id:'order-modal'});
+  o.classList.add('plan-modal');
+        Object.assign(o.style, {position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,.32)',zIndex:99999,display:'flex',alignItems:'center',justifyContent:'center'});
+        const unitPrice = 1220;
+        const totalPrice = units * unitPrice;
+        // Payment methods with icons
+        const methods = [
+          {id:'NetBanking', name:'Net Banking', icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="10" rx="2" stroke="#e11d48" stroke-width="2"/><rect x="7" y="11" width="2" height="2" fill="#e11d48"/><rect x="11" y="11" width="2" height="2" fill="#e11d48"/><rect x="15" y="11" width="2" height="2" fill="#e11d48"/></svg>'},
+          {id:'UPI', name:'UPI', icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="10" rx="2" stroke="#047857" stroke-width="2"/><path d="M7 17l4-10 4 10" stroke="#047857" stroke-width="2"/></svg>'},
+          {id:'Card', name:'Card', icon:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#6366f1" stroke-width="2"/><rect x="7" y="14" width="6" height="2" fill="#6366f1"/><circle cx="17" cy="15" r="1" fill="#6366f1"/></svg>'}
+        ];
+        let selected = null;
+        let step = 1;
+        function renderStep() {
+          let html = '';
+          if (step === 1) {
+            html = `
+              <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Order Blood Units</div>
+              <div class="muted" style="margin-bottom:.7rem">${units} unit(s) of <b>${group}</b> for <b>${hospital}</b></div>
+              <div class="muted" style="margin-bottom:.7rem">Unit Price: ₹${unitPrice} | Total: <b>₹${totalPrice}</b></div>
+              <div style="margin-bottom:1.2rem">
+                <div style="font-weight:700;margin-bottom:.3rem">Choose Payment Method</div>
+                <div class="row" id="pay-methods" style="gap:.7rem;flex-wrap:wrap;justify-content:center">
+                  ${methods.map(m=>`
+                    <button class="btn outline" data-method="${m.id}" style="border-width:2px;${selected===m.id?'border-color:#6366f1;background:#6366f110;transform:scale(1.07);box-shadow:0 2px 12px #6366f122;':''}">
+                      ${m.icon}<span>${m.name}</span>
+                    </button>`).join('')}
+                </div>
+              </div>
+              <button class="btn" id="pay-next" style="width:100%" ${selected?'' : 'disabled'}>Continue</button>
+              <button class="btn outline" style="margin-top:.7rem;width:100%" onclick="document.body.removeChild(document.getElementById('order-modal'))">Cancel</button>
+            `;
+          } else if (step === 2) {
+            const m = methods.find(m=>m.id===selected);
+            if (selected === 'Card') {
+              html = `
+                <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Card Payment</div>
+                <div class="muted" style="margin-bottom:.7rem">Pay <b>₹${totalPrice}</b> to <b>${hospital}</b> via <b>Card</b></div>
+                <form id="card-form" autocomplete="off" style="margin-bottom:1.2rem;text-align:left">
+                  <label style="font-weight:600;font-size:.97rem;">Card Number</label>
+                  <input type="text" id="card-number" maxlength="19" placeholder="1234 5678 9012 3456" style="width:100%;padding:.6rem .8rem;margin-bottom:.7rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9 ]*" required />
+                  <div style="display:flex;gap:.7rem;margin-bottom:.7rem">
+                    <div style="flex:1">
+                      <label style="font-weight:600;font-size:.97rem;">Expiry</label>
+                      <input type="text" id="card-expiry" maxlength="5" placeholder="MM/YY" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9/]*" required />
+                    </div>
+                    <div style="flex:1">
+                      <label style="font-weight:600;font-size:.97rem;">CVV</label>
+                      <input type="password" id="card-cvv" maxlength="4" placeholder="123" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem" inputmode="numeric" pattern="[0-9]*" required />
+                    </div>
+                  </div>
+                  <label style="font-weight:600;font-size:.97rem;">Name on Card</label>
+                  <input type="text" id="card-name" maxlength="32" placeholder="Cardholder Name" style="width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #d1d5db;font-size:1rem;margin-bottom:.7rem" required />
+                </form>
+                <button class="btn" id="pay-confirm" style="width:100%" disabled>Pay Now</button>
+                <button class="btn outline" style="margin-top:.7rem;width:100%" id="pay-back">Back</button>
+              `;
+            } else {
+              html = `
+                <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Confirm Payment</div>
+                <div class="muted" style="margin-bottom:.7rem">Pay <b>₹${totalPrice}</b> to <b>${hospital}</b> via <b>${m.name}</b></div>
+                <div style="margin-bottom:1.2rem">${m.icon}</div>
+                <button class="btn" id="pay-confirm" style="width:100%">Pay Now</button>
+                <button class="btn outline" style="margin-top:.7rem;width:100%" id="pay-back">Back</button>
+              `;
+            }
+          } else if (step === 3) {
+            html = `
+              <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem">Processing Payment…</div>
+              <div style="margin:1.5rem 0"><div class="spinner" style="margin:auto;width:48px;height:48px;border:5px solid #f3f3f3;border-top:5px solid #6366f1;border-radius:50%;animation:spin 1s linear infinite"></div></div>
+            `;
+          } else if (step === 4) {
+            html = `
+              <div style="font-size:1.2rem;font-weight:800;margin-bottom:.7rem;color:#047857">Payment Successful!</div>
+              <div style="font-size:2.2rem;margin-bottom:.7rem">🎉</div>
+              <div class="muted" style="margin-bottom:1.2rem">Your payment of <b>₹${totalPrice}</b> to <b>${hospital}</b> was successful.</div>
+              <button class="btn" style="width:100%" onclick="document.body.removeChild(document.getElementById('order-modal'))">Done</button>
+            `;
+          }
+          o.innerHTML = `<div style="background:#fff;padding:2rem 2.2rem;border-radius:22px;max-width:390px;text-align:center;box-shadow:var(--shadow-1);min-width:320px;animation:fadeInUp .5s cubic-bezier(.4,1.4,.6,1) both">
+            ${html}
+          </div>`;
+          // Add spinner and fade animation style
+          if (!document.getElementById('pay-spin-style')) {
+            const style = document.createElement('style');
+            style.id = 'pay-spin-style';
+            style.innerHTML = `@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}@keyframes fadeInUp{0%{opacity:0;transform:translateY(32px);}100%{opacity:1;transform:none;}}`;
+            document.head.appendChild(style);
+          }
+          // Add listeners for step 1
+          if (step === 1) {
+            o.querySelectorAll('[data-method]').forEach(btn => {
+              btn.onclick = function() {
+                selected = this.getAttribute('data-method');
+                renderStep();
+              };
+            });
+            o.querySelector('#pay-next').onclick = function() {
+              if (selected) { step = 2; renderStep(); }
+            };
+          }
+          // Step 2 listeners
+          if (step === 2) {
+            if (selected === 'Card') {
+              // Card form validation
+              const cardNumber = o.querySelector('#card-number');
+              const cardExpiry = o.querySelector('#card-expiry');
+              const cardCVV = o.querySelector('#card-cvv');
+              const cardName = o.querySelector('#card-name');
+              const payBtn = o.querySelector('#pay-confirm');
+              function validateCard() {
+                // Simple validation: all fields filled, card number 16 digits, expiry MM/YY, CVV 3-4 digits
+                const num = cardNumber.value.replace(/\s+/g, '');
+                const exp = cardExpiry.value;
+                const cvv = cardCVV.value;
+                const name = cardName.value.trim();
+                let valid = num.length === 16 && /^\d{2}\/\d{2}$/.test(exp) && (cvv.length === 3 || cvv.length === 4) && name.length > 0;
+                payBtn.disabled = !valid;
+              }
+              [cardNumber, cardExpiry, cardCVV, cardName].forEach(input => {
+                input.addEventListener('input', validateCard);
+              });
+              // Format card number as XXXX XXXX XXXX XXXX
+              cardNumber.addEventListener('input', function(e) {
+                let v = this.value.replace(/[^\d]/g, '').slice(0,16);
+                this.value = v.replace(/(.{4})/g, '$1 ').trim();
+              });
+              // Format expiry as MM/YY
+              cardExpiry.addEventListener('input', function(e) {
+                let v = this.value.replace(/[^\d]/g, '').slice(0,4);
+                if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+                this.value = v;
+              });
+              payBtn.onclick = function() {
+                step = 3; renderStep();
+                setTimeout(()=>{ step = 4; renderStep(); }, 1800);
+              };
+              o.querySelector('#pay-back').onclick = function() {
+                step = 1; renderStep();
+              };
+            } else {
+              o.querySelector('#pay-confirm').onclick = function() {
+                step = 3; renderStep();
+                setTimeout(()=>{ step = 4; renderStep(); }, 1800);
+              };
+              o.querySelector('#pay-back').onclick = function() {
+                step = 1; renderStep();
+              };
+            }
+          }
+        }
+        renderStep();
+        document.body.appendChild(o);
+      }
+
+      window.payHospital = function(method, hospital, amount) {
+  let url = '';
+  if (method === 'NetBanking') url = `https://netbanking.example.com/pay?hospital=${encodeURIComponent(hospital)}&amount=${amount}`;
+  else if (method === 'UPI') url = `upi://pay?pa=${encodeURIComponent(hospital)}@upi&am=${amount}`;
+  if (url) window.open(url, '_blank');
+  toast(`Proceeding to pay \u20b9${amount} to ${hospital} via ${method}`);
+      }
+
+      // -------- Live location tracking --------
+      let locWatchId = null;
+      let lastLocation = null;
+  const ACCURACY_THRESHOLD_METERS = 25; // preferred max accuracy to auto-send
+
+      function fmtTime(ts){ return new Date(ts).toLocaleString(); }
+
+      // Try to obtain a higher-accuracy position by sampling a few times
+      function getAccuratePosition(attempts = 4, perAttemptTimeout = 7000){
+        return new Promise((resolve)=>{
+          if(!('geolocation' in navigator)){ resolve(null); return; }
+          let best = null; let completed = 0;
+          const tryOnce = (i)=>{
+            const opts = { enableHighAccuracy:true, maximumAge:0, timeout: perAttemptTimeout };
+            navigator.geolocation.getCurrentPosition(pos=>{
+              completed++;
+              if(!best || (pos.coords && pos.coords.accuracy < (best.coords?.accuracy || 1e9))) best = pos;
+              if(completed>=attempts){ resolve(best); }
+            }, err=>{
+              completed++;
+              if(completed>=attempts) resolve(best);
+            }, opts);
+          };
+          for(let i=0;i<attempts;i++){ tryOnce(i); }
+          // fallback: resolve after a maximum time
+          setTimeout(()=>{ resolve(best); }, attempts * perAttemptTimeout + 500);
+        });
+      }
+
+      function updateLocationUI(pos){
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        const acc = (pos.coords.accuracy || 9999).toFixed(1);
+        document.getElementById('loc-lat').textContent = lat;
+        document.getElementById('loc-lng').textContent = lng;
+        document.getElementById('loc-acc').textContent = acc;
+        document.getElementById('loc-time').textContent = fmtTime(pos.timestamp || Date.now());
+        // show quality hint
+        const stateEl = document.getElementById('loc-state');
+        if(pos.coords.accuracy <= 10) stateEl.textContent = 'high accuracy';
+        else if(pos.coords.accuracy <= 50) stateEl.textContent = 'good accuracy';
+        else stateEl.textContent = 'low accuracy';
+        lastLocation = pos;
+      }
+
+      function startLocation(){
+        if (!('geolocation' in navigator)) { toast('Geolocation not supported'); return; }
+        if (locWatchId != null){ toast('Already tracking'); return; }
+        // Stronger options for tracking: prefer high accuracy, no caching
+        locWatchId = navigator.geolocation.watchPosition(pos => {
+          updateLocationUI(pos);
+          // Optionally auto-send only when accuracy good
+          // sendLocation() will check accuracy before sending
+        }, err => {
+          toast('Location error: ' + err.message);
+        }, { enableHighAccuracy:true, maximumAge:0, timeout:20000 });
+        document.getElementById('loc-state').textContent = 'starting…';
+        ensureNotificationPermission();
+        toast('Started location tracking (high accuracy preferred)');
+      }
+
+      function stopLocation(){
+        if (locWatchId == null){ toast('Not tracking'); return; }
+        navigator.geolocation.clearWatch(locWatchId);
+        locWatchId = null;
+        document.getElementById('loc-state').textContent = 'stopped';
+        toast('Stopped location tracking');
+      }
+
+      async function sendLocation(){
+        if (!lastLocation){ toast('No location to send'); return; }
+        // If accuracy is poor, try to get a high-accuracy sample first
+        const acc = lastLocation.coords?.accuracy || 9999;
+        if(acc > ACCURACY_THRESHOLD_METERS){
+          toast('Accuracy is low ('+acc.toFixed(1)+'m). Trying high-accuracy sample...');
+          const better = await getAccuratePosition(5,9000);
+          if(better) lastLocation = better; // replace with better sample
+        }
+        const payload = {
+          lat: lastLocation.coords.latitude,
+          lng: lastLocation.coords.longitude,
+          accuracy: lastLocation.coords.accuracy,
+          ts: lastLocation.timestamp || Date.now()
+        };
+        // Read visibility options from UI
+        const vis = {
+          donor: document.getElementById('vis-donor').checked,
+          recipient: document.getElementById('vis-recipient').checked,
+          hospital: document.getElementById('vis-hospital').checked,
+          others: document.getElementById('vis-others').checked
+        };
+
+  const entry = { id: 'loc_'+Date.now(), lat: payload.lat, lng: payload.lng, accuracy: payload.accuracy, ts: payload.ts, visibility: vis, owner: 'me' };
+        // Save to localStorage so others (same machine/browser) can see; in a real app this would POST to server
+        const arr = loadSharedLocations();
+  arr.unshift(entry);
+  saveSharedLocations(arr);
+  // Broadcast to other tabs/windows
+  try{ if(bc) bc.postMessage({type:'new-location', entry}); else localStorage.setItem('lifeline_last_shared', JSON.stringify(entry)); }catch(e){}
+  renderSharedLocations();
+        // Optional network send (uncomment and configure endpoint)
+        // try{
+        //   const res = await fetch('https://your-server.example.com/locations', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+        //   if(res.ok) toast('Location sent'); else toast('Failed to send');
+        // }catch(e){ toast('Send error'); }
+        toast(`Shared location: ${payload.lat.toFixed(5)}, ${payload.lng.toFixed(5)} (acc ${payload.accuracy}m)`);
+      }
+
+      // Wire buttons
+      document.addEventListener('click', function(e){
+        if(e.target && e.target.id === 'loc-start') startLocation();
+        if(e.target && e.target.id === 'loc-stop') stopLocation();
+        if(e.target && e.target.id === 'loc-send') sendLocation();
+        if(e.target && e.target.id === 'loc-sample'){
+          (async ()=>{ ensureNotificationPermission(); const better = await getAccuratePosition(6,9000); if(better){ updateLocationUI(better); toast('Got a higher-accuracy sample ('+ (better.coords.accuracy||0).toFixed(1)+'m)'); } else { toast('Could not obtain a better sample'); } })();
+        }
+      });
+
+      // ---------- Shared locations (localStorage-backed) ----------
+      const SHARED_KEY = 'lifeline_shared_locations_v1';
+
+      function loadSharedLocations(){
+        try{ const raw = localStorage.getItem(SHARED_KEY); return raw?JSON.parse(raw):[] }catch(e){return[]}
+      }
+      function saveSharedLocations(arr){ try{ localStorage.setItem(SHARED_KEY, JSON.stringify(arr.slice(0,200))); }catch(e){} }
+
+      // --- Cross-window/channel notifications ---
+      // BroadcastChannel to notify other tabs/windows; fallback to storage events
+      const bc = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('lifeline_channel') : null;
+      if(bc){ bc.onmessage = (ev)=>{ try{ if(ev.data && ev.data.type === 'new-location') handleIncomingLocation(ev.data.entry); }catch(e){} } }
+
+      // Storage event fallback (other tabs/windows on same origin)
+      window.addEventListener('storage', (e)=>{
+        try{
+          if(!e.key) return;
+          if(e.key === SHARED_KEY){
+            const arr = e.newValue ? JSON.parse(e.newValue) : [];
+            if(Array.isArray(arr) && arr.length>0){ handleIncomingLocation(arr[0]); }
+          }
+          if(e.key === 'lifeline_last_shared'){
+            const entry = e.newValue ? JSON.parse(e.newValue) : null;
+            if(entry) handleIncomingLocation(entry);
+          }
+        }catch(ex){ console.info('storage event parse failed', ex); }
+      });
+
+      function shouldNotifyForEntry(entry){
+        try{
+          const role = (document.getElementById('viewer-role')?.value || 'Other');
+          if(role === 'Donor') return !!entry.visibility?.donor;
+          if(role === 'Recipient') return !!entry.visibility?.recipient;
+          if(role === 'Hospital') return !!entry.visibility?.hospital;
+          // Others see if any visibility flag is true
+          return !!(entry.visibility?.others || entry.visibility?.donor || entry.visibility?.recipient || entry.visibility?.hospital);
+        }catch(e){ return true; }
+      }
+
+      function buildMapsUrl(lat,lng){ return `https://www.google.com/maps?q=${lat},${lng}`; }
+
+      function ensureNotificationPermission(){ if('Notification' in window && Notification.permission === 'default'){ Notification.requestPermission().then(()=>{}); } }
+
+      function notifyNewLocation(entry){
+        try{
+          if(!shouldNotifyForEntry(entry)) return;
+          const lat = Number(entry.lat); const lng = Number(entry.lng);
+          const mapsUrl = buildMapsUrl(lat,lng);
+          // In-page toast
+          toast(`Shared location: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+          // System notification if allowed
+          if('Notification' in window && Notification.permission === 'granted'){
+            const n = new Notification('New shared location', { body: `${lat.toFixed(5)}, ${lng.toFixed(5)}`, tag: entry.id });
+            n.onclick = function(){ try{ window.focus(); window.open(mapsUrl,'_blank'); }catch(e){} };
+          }
+        }catch(e){ console.error(e); }
+      }
+
+      function handleIncomingLocation(entry){
+        // Avoid notifying about our own broadcasts if owner === 'me' in same tab
+        try{
+          // Update UI list
+          renderSharedLocations();
+          // If this tab should be notified, show a notification
+          notifyNewLocation(entry);
+        }catch(e){ console.error(e); }
+      }
+
+      function renderSharedLocations(){
+        const container = document.getElementById('shared-locations');
+        if(!container) return;
+        const role = (document.getElementById('viewer-role')?.value||'Other');
+        const arr = loadSharedLocations();
+        // filter by visibility
+        const visible = arr.filter(e=>{
+          if(role==='Donor') return e.visibility?.donor;
+          if(role==='Recipient') return e.visibility?.recipient;
+          if(role==='Hospital') return e.visibility?.hospital;
+          return e.visibility?.others || e.visibility?.donor || e.visibility?.recipient || e.visibility?.hospital;
+        });
+        if(visible.length===0){ container.innerHTML = '<div class="muted">No shared locations visible to you.</div>'; return }
+        container.innerHTML = visible.map(e=>{
+          const time = new Date(e.ts).toLocaleString();
+          return `<div style="padding:.5rem 0;border-bottom:1px solid #f3f4f6"><div style="font-weight:700">${e.lat.toFixed(5)}, ${e.lng.toFixed(5)}</div><div class="muted" style="font-size:.85rem">${time} • acc ${e.accuracy}m</div></div>`;
+        }).join('');
+      }
+
+      // Re-render when viewer role changes or visibility toggles
+      ['viewer-role','vis-donor','vis-recipient','vis-hospital','vis-others'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.addEventListener('change', renderSharedLocations);
+      });
+
+      // Auto-send option when tracking
+      const autoEl = document.getElementById('auto-send');
+      const origUpdate = updateLocationUI;
+      function updateLocationUI_withAuto(pos){ origUpdate(pos); if(autoEl && autoEl.checked) { sendLocation(); } }
+      // Replace updateLocationUI in runtime
+      updateLocationUI = updateLocationUI_withAuto;
+
+      // Initial render
+      renderSharedLocations();
+
+      // ---------- Share helpers (WhatsApp, Telegram, SMS, Email, Copy, Web Share) ----------
+      function buildMapLink(lat,lng,label){
+        const q = encodeURIComponent((label||'Shared location') + ' @ ' + lat.toFixed(6) + ',' + lng.toFixed(6));
+        // Use Google Maps link (works on web and mobile)
+        return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=`;
+      }
+
+      function buildMapsText(lat,lng){ return `I'm sharing my location: https://www.google.com/maps?q=${lat},${lng}` }
+
+      async function doShare(platform){
+        if(!lastLocation){ toast('No location to share'); return; }
+        const lat = lastLocation.coords.latitude; const lng = lastLocation.coords.longitude;
+        const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        const text = `My location: ${mapsUrl}`;
+        try{
+          if(platform==='whatsapp'){
+            // Prefer whatsapp:// on mobile for native app open, fallback to web link
+            const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const url = mobile ? `whatsapp://send?text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.location.href = url;
+          } else if(platform==='telegram'){
+            const url = `https://t.me/share/url?url=${encodeURIComponent(mapsUrl)}&text=${encodeURIComponent('My location')}`;
+            window.open(url,'_blank');
+          } else if(platform==='sms'){
+            // sms:?body=... works on many mobile clients; some platforms support sms:&body
+            const sep = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?';
+            const url = `sms:${sep}body=${encodeURIComponent(text)}`;
+            window.location.href = url;
+          } else if(platform==='email'){
+            const url = `mailto:?subject=${encodeURIComponent('My location')}&body=${encodeURIComponent(text)}`;
+            window.location.href = url;
+          } else if(platform==='copy'){
+            await navigator.clipboard.writeText(mapsUrl);
+            toast('Link copied to clipboard');
+          } else if(platform==='web'){
+            if(navigator.share){
+              await navigator.share({title:'My location', text:'Sharing my live location', url:mapsUrl});
+            } else { toast('Web Share API not available'); }
+          }
+        }catch(e){ console.error(e); toast('Share failed'); }
+      }
+
+      // Wire share buttons
+      document.getElementById('share-wa')?.addEventListener('click', ()=>doShare('whatsapp'));
+      document.getElementById('share-tg')?.addEventListener('click', ()=>doShare('telegram'));
+      document.getElementById('share-sms')?.addEventListener('click', ()=>doShare('sms'));
+      document.getElementById('share-mail')?.addEventListener('click', ()=>doShare('email'));
+      document.getElementById('share-copy')?.addEventListener('click', ()=>doShare('copy'));
+      const webBtn = document.getElementById('share-web');
+      if(webBtn && navigator.share){ webBtn.style.display = 'inline-flex'; webBtn.addEventListener('click', ()=>doShare('web')); }
+
+      // ---------- Mini live-map (SVG) ----------
+      // Provides a simple on-page visualization of the most recent path and marker.
+      const liveMap = (function(){
+        const svg = document.getElementById('mini-map');
+        const trackLayer = document.getElementById('track-layer');
+        const pointsLayer = document.getElementById('points-layer');
+        const marker = document.getElementById('marker');
+        if(!svg || !trackLayer || !marker) return null;
+
+        const width = 400, height = 200; // viewBox size
+        let points = []; // {lat,lng,ts}
+        const MAX_POINTS = 120; // keep recent history
+
+        function latLngToXY(lat,lng){
+          // If we have at least one point, compute bounding box around recent points
+          const all = points.length>0 ? points : [{lat,lng}];
+          let minLat = Math.min(...all.map(p=>p.lat));
+          let maxLat = Math.max(...all.map(p=>p.lat));
+          let minLng = Math.min(...all.map(p=>p.lng));
+          let maxLng = Math.max(...all.map(p=>p.lng));
+          // pad box a bit
+          const latPad = Math.max(0.0005, (maxLat-minLat)*0.12);
+          const lngPad = Math.max(0.0005, (maxLng-minLng)*0.12);
+          minLat -= latPad; maxLat += latPad; minLng -= lngPad; maxLng += lngPad;
+          // Prevent zero-span
+          if(minLat === maxLat){ minLat -= 0.0005; maxLat += 0.0005; }
+          if(minLng === maxLng){ minLng -= 0.0005; maxLng += 0.0005; }
+          // Convert to x/y (lng -> x, lat -> y). Flip y so north is up.
+          const x = ((lng - minLng) / (maxLng - minLng)) * width;
+          const y = (1 - (lat - minLat) / (maxLat - minLat)) * height;
+          return {x,y};
+        }
+
+        function rebuildTrack(){
+          trackLayer.innerHTML = '';
+          if(points.length < 2) return;
+          const d = points.map((p,i)=>{
+            const {x,y} = latLngToXY(p.lat,p.lng);
+            return (i===0?`M ${x.toFixed(2)} ${y.toFixed(2)}`:`L ${x.toFixed(2)} ${y.toFixed(2)}`);
+          }).join(' ');
+          const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+          path.setAttribute('d', d);
+          path.setAttribute('stroke','rgba(244,63,94,0.9)');
+          path.setAttribute('stroke-width','3');
+          path.setAttribute('fill','none');
+          path.setAttribute('stroke-linecap','round');
+          path.setAttribute('stroke-linejoin','round');
+          trackLayer.appendChild(path);
+        }
+
+        function placeMarkers(){
+          pointsLayer.innerHTML = '';
+          // draw small fading circles for history
+          const max = points.length;
+          points.forEach((p,i)=>{
+            const alpha = 0.2 + 0.6*(i/max);
+            const {x,y} = latLngToXY(p.lat,p.lng);
+            const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+            c.setAttribute('cx', x.toFixed(2));
+            c.setAttribute('cy', y.toFixed(2));
+            c.setAttribute('r', Math.max(2, 4*(i===max-1?1:0.6)));
+            c.setAttribute('fill', `rgba(244,63,94,${alpha.toFixed(2)})`);
+            pointsLayer.appendChild(c);
+          });
+        }
+
+        function animateTo(lat,lng){
+          const {x,y} = latLngToXY(lat,lng);
+          // animate marker using SVG attributes (transition on marker present in CSS)
+          marker.setAttribute('cx', x);
+          marker.setAttribute('cy', y);
+        }
+
+        return {
+          addPoint(pt){
+            if(!pt || typeof pt.lat !== 'number' || typeof pt.lng !== 'number') return;
+            points.push({lat:pt.lat,lng:pt.lng,ts:pt.ts||Date.now()});
+            if(points.length>MAX_POINTS) points = points.slice(points.length-MAX_POINTS);
+            rebuildTrack(); placeMarkers(); animateTo(pt.lat,pt.lng);
+          },
+          clear(){ points = []; rebuildTrack(); pointsLayer.innerHTML=''; marker.setAttribute('cx', 200); marker.setAttribute('cy', 100); }
+        };
+      })();
+
+      // Wire liveMap to update on local updates and on incoming shared locations
+      const orig_updateLocationUI = updateLocationUI;
+      updateLocationUI = function(pos){ orig_updateLocationUI(pos);
+        try{ if(liveMap){ liveMap.addPoint({lat:pos.coords.latitude, lng:pos.coords.longitude, ts: pos.timestamp}); } }catch(e){}
+      };
+
+      const orig_handleIncomingLocation = handleIncomingLocation;
+      handleIncomingLocation = function(entry){
+        try{ if(entry && entry.lat && entry.lng && liveMap){ liveMap.addPoint({lat:Number(entry.lat), lng:Number(entry.lng), ts: entry.ts}); } }catch(e){}
+        orig_handleIncomingLocation(entry);
+      };
+  </script>
 </body>
 </html>
