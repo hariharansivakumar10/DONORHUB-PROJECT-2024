@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.1-apache
+    ports:
+      - "3001:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Mount initial schema
+      - ./database:/docker-entrypoint-initdb.d
+
+volumes:
+  mysql_data:
+
+# Note: Configure the following in your .env file:
+# DB_HOST=mysql
+# DB_NAME=donorhub
+# DB_USER=donorhub_user
+# DB_PASSWORD=your_password
+# DB_ROOT_PASSWORD=root_password
