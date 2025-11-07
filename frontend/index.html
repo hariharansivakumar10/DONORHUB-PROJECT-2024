@@ -1004,6 +1004,8 @@
       document.getElementById('profile-menu').style.display='flex';
       document.getElementById('profile-name').textContent = user.name;
       showLogoutInNav(); renderInventory(); renderDonors(); revealOnScroll(); renderSharedLocations();
+      // Navigate to the main inventory/dashboard after login/signup
+      try{ window.location.hash = 'inventory'; }catch(e){ /* ignore */ }
       toast('Welcome ' + user.name);
     }
 
